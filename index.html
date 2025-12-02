@@ -1,0 +1,3968 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="הכסף שלי" />
+    <meta name="theme-color" content="#0f1a2a" />
+    <meta name="msapplication-TileColor" content="#0f1a2a" />
+    <title>הכסף שלי — v1.01</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --glass-bg: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.12);
+            --accent: #7EE7C7;
+            --muted: #9AA4B2;
+            --glass-blur: 14px;
+            --card-shadow: 0 12px 40px rgba(2,6,23,0.6);
+            --opacity: 1;
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(126,231,199,0.1); }
+            50% { box-shadow: 0 0 40px rgba(126,231,199,0.25); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity:0; }
+            to { opacity:1; }
+        }
+
+        *{box-sizing:border-box;transition:color .18s,background .18s,border-color .18s,box-shadow .18s,transform .12s}
+        html,body{height:100%;margin:0;font-family:'Rubik','Inter',system-ui,Segoe UI,Roboto,Arial;color:#e9eef6;background:linear-gradient(135deg, #0a1420 0%, #0f1a2a 50%, #081426 100%);background-size:400% 400%;animation:gradientShift 30s ease infinite;-webkit-font-smoothing:antialiased;background-attachment:fixed;position:relative;width:100%;overflow-x:hidden;overflow-y:auto}
+        
+        body {
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        html {
+            width: 100%;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content:'';
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background-image:
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(126,231,199,0.03) 2px, rgba(126,231,199,0.03) 4px),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(126,231,199,0.02) 2px, rgba(126,231,199,0.02) 4px);
+            pointer-events:none;
+            z-index:1;
+        }
+
+        /* Layout */
+        .page{display:flex;flex-direction:column;position:relative;z-index:2;width:100%;max-width:100%;overflow-x:hidden;min-height:100vh}
+        .topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 22px;gap:16px;background:rgba(7,16,32,0.4);backdrop-filter:blur(12px);border-bottom:1px solid rgba(126,231,199,0.1);animation:floatSlow 12s ease-in-out infinite;flex-wrap:wrap;flex-shrink:0;width:100%;box-sizing:border-box;position:relative;z-index:10}
+
+        /* Glass panel */
+        .glass{backdrop-filter:blur(var(--glass-blur));background:linear-gradient(135deg, rgba(255,255,255,calc(0.04 * var(--opacity))), rgba(126,231,199,calc(0.02 * var(--opacity))));border-radius:14px;padding:10px;border:1px solid rgba(126,231,199,calc(0.15 * var(--opacity)));box-shadow:inset 0 1px 0 rgba(255,255,255,calc(0.08 * var(--opacity))), 0 8px 32px rgba(126,231,199,calc(0.08 * var(--opacity)));transition:all .3s cubic-bezier(0.4, 0, 0.2, 1)}
+        .glass:hover{border-color:rgba(126,231,199,calc(0.25 * var(--opacity)));box-shadow:inset 0 1px 0 rgba(255,255,255,calc(0.1 * var(--opacity))), 0 12px 40px rgba(126,231,199,calc(0.15 * var(--opacity)))}
+        
+        .card{width:100%;max-width:1100px;padding:28px;border-radius:18px;box-shadow:0 25px 50px -12px rgba(2,6,23,0.8),inset 0 1px 0 rgba(255,255,255,0.08);background:linear-gradient(135deg, rgba(255,255,255,calc(0.03 * var(--opacity))), rgba(126,231,199,calc(0.015 * var(--opacity))));border:1px solid rgba(126,231,199,calc(0.12 * var(--opacity)));animation:floatSlow 16s ease-in-out infinite;box-sizing:border-box}
+
+        /* Brand */
+        .brand{font-weight:700;color:var(--accent);font-size:1.25rem;letter-spacing:0.4px;animation:floatSlow 8s ease-in-out infinite}
+        .brand + div{font-size:0.9rem;color:var(--muted);margin-top:2px}
+
+        /* Controls */
+        .controls{display:flex;gap:10px;align-items:center}
+        .btn{background:rgba(255,255,255,0.03);border:1px solid rgba(126,231,199,calc(0.08 * var(--opacity)));color:inherit;padding:8px 12px;border-radius:10px;cursor:pointer;backdrop-filter:blur(10px);transition:all .2s;position:relative;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+        .btn::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at center, rgba(126,231,199,0.1) 0%, transparent 70%);border-radius:10px;opacity:0;transition:opacity .2s}
+        .btn:hover::before{opacity:1}
+        .btn:active{transform:scale(0.98)}
+        .btn-primary{background:linear-gradient(90deg, rgba(126,231,199,calc(0.16 * var(--opacity))), rgba(125,211,252,calc(0.08 * var(--opacity))));border:1px solid rgba(126,231,199,calc(0.25 * var(--opacity)))}
+        .btn:hover{transform:translateY(-2px);border-color:rgba(126,231,199,calc(0.18 * var(--opacity)));box-shadow:0 12px 28px rgba(126,231,199,calc(0.15 * var(--opacity))), inset 0 1px 0 rgba(255,255,255,0.1)}
+
+        h1{margin:0 0 8px 0;font-weight:600;background:linear-gradient(90deg, #e9eef6, var(--accent), #7EE7C7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200% 200%;animation:gradientShift 12s ease infinite}
+        p.lead{margin:0;color:var(--muted);line-height:1.45}
+
+        .banner{margin-top:16px;padding:14px;border-radius:12px;background:linear-gradient(90deg, rgba(126,231,199,calc(0.06 * var(--opacity))), rgba(99,102,241,calc(0.04 * var(--opacity))));border:1px solid rgba(126,231,199,calc(0.15 * var(--opacity)));color:var(--muted);backdrop-filter:blur(10px);animation:pulseGlow 8s ease-in-out infinite}
+
+        .main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;position:relative;z-index:3;overflow-y:visible;width:100%;box-sizing:border-box}
+        .footer{padding:20px;text-align:center;color:var(--muted);font-size:0.95rem;border-top:1px solid rgba(126,231,199,0.08);background:rgba(7,16,32,0.2);flex-shrink:0;width:100%;box-sizing:border-box;position:relative;z-index:5}
+
+        /* Modal */
+        .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,calc(0.65 * var(--opacity)));display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;backdrop-filter:blur(calc(6px * var(--opacity)));transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);box-sizing:border-box}
+        .modal.active{opacity:1;pointer-events:auto}
+        .modal-content{background:linear-gradient(135deg, rgba(255,255,255,calc(0.04 * var(--opacity))), rgba(126,231,199,calc(0.02 * var(--opacity))));border:1px solid rgba(126,231,199,calc(0.15 * var(--opacity)));border-radius:14px;padding:26px;max-width:720px;width:94%;max-height:86vh;overflow:auto;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08);transform:translateY(6px) scale(0.95);opacity:0;backdrop-filter:blur(20px);transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);box-sizing:border-box}
+        .modal.active .modal-content{transform:translateY(0) scale(1);opacity:1}
+
+        .modal-content h2{margin:0 0 16px 0;color:var(--accent);font-weight:600}
+        .modal-content input,.modal-content select{width:100%;padding:10px;margin:8px 0;background:rgba(255,255,255,calc(0.03 * var(--opacity)));border:1px solid rgba(126,231,199,calc(0.1 * var(--opacity)));border-radius:10px;color:inherit;font-size:1rem;backdrop-filter:blur(10px);transition:all .2s}
+        .modal-content input:focus,.modal-content select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(126,231,199,calc(0.15 * var(--opacity))), inset 0 1px 0 rgba(255,255,255,0.05)}
+
+        .modal-content button{width:100%;margin-top:12px;padding:10px;font-weight:600;border-radius:10px;transition:all .2s}
+        .modal-content button:hover{transform:translateY(-1px)}
+        .modal-toggle{display:flex;gap:8px;margin-top:12px}
+        .modal-toggle button{flex:1}
+        .modal-close{float:right;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--accent);transition:all .2s;padding:4px}
+        .modal-close:hover{transform:rotate(90deg) scale(1.1)}
+
+        /* Settings */
+        .settings-container{display:flex;gap:18px;flex-wrap:wrap}
+        .settings-section{flex:1;min-width:260px;padding:16px;border-radius:12px;background:linear-gradient(135deg, rgba(255,255,255,calc(0.025 * var(--opacity))), rgba(126,231,199,calc(0.012 * var(--opacity))));border:1px solid rgba(126,231,199,calc(0.1 * var(--opacity)));backdrop-filter:blur(10px);transition:all .3s;animation:floatSlow 20s ease-in-out infinite}
+        .settings-section:hover{border-color:rgba(126,231,199,calc(0.2 * var(--opacity)));box-shadow:0 8px 24px rgba(126,231,199,calc(0.08 * var(--opacity)))}
+        .settings-section h3{margin:0 0 12px 0;color:var(--accent);font-size:0.95rem}
+        .settings-row{margin:12px 0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+        .settings-row label{font-size:0.92rem;color:var(--muted)}
+
+        /* Currency UI removed - simplified to a single default currency (₪) */
+
+        .nav-tabs{display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid rgba(126,231,199,calc(0.1 * var(--opacity)));padding-bottom:8px;overflow-x:auto}
+        .nav-tabs button{background:none;border:none;padding:8px 12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+        .nav-tabs button:hover{color:var(--accent)}
+        .nav-tabs button.active{border-bottom-color:var(--accent);color:var(--accent)}
+        .tab-content{display:none;animation:fadeIn .3s ease}
+        .tab-content.active{display:block}
+
+        .error-msg{color:#ff8787;font-size:0.92rem;margin-top:8px}
+
+        /* Opacity slider styling */
+        input[type="range"]{width:100%;height:6px;border-radius:3px;background:linear-gradient(90deg, rgba(126,231,199,0.2), rgba(126,231,199,0.4));outline:none;-webkit-appearance:none}
+        input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 2px 8px rgba(126,231,199,0.4);transition:all .2s}
+        input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);box-shadow:0 4px 16px rgba(126,231,199,0.6)}
+        input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:none;box-shadow:0 2px 8px rgba(126,231,199,0.4);transition:all .2s}
+        input[type="range"]::-moz-range-thumb:hover{transform:scale(1.2);box-shadow:0 4px 16px rgba(126,231,199,0.6)}
+
+        /* Tablet (medium screens) */
+        @media (max-width: 1024px) {
+            .panel-content {
+                padding: 24px;
+            }
+
+            .budget-step {
+                padding: 20px;
+            }
+
+            .calculations-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .period-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Large phones and small tablets */
+        @media (max-width: 768px) {
+            .panel-header {
+                padding: 16px 20px;
+            }
+
+            .panel-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .panel-content {
+                padding: 16px;
+                padding-bottom: 100px;
+            }
+
+            .budget-step {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+
+            .step-header {
+                gap: 12px;
+            }
+
+            .step-number {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .step-title {
+                font-size: 1.1rem;
+            }
+
+            .calculations-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .calc-card {
+                padding: 12px;
+            }
+
+            .period-selector {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .period-btn {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+
+            .date-range-group {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-actions {
+                grid-template-columns: 1fr;
+                padding: 12px 16px;
+                gap: 12px;
+            }
+
+            .btn-secondary,
+            .btn-primary {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+
+            .main {
+                padding: 28px;
+            }
+
+            .settings-container {
+                flex-direction: column;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            /* Mobile transaction cards */
+            section[style*="display:grid"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        .dashboard-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            position: relative;
+            z-index: 600;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid rgba(126,231,199,0.2);
+            background: rgba(126,231,199,0.08);
+            color: var(--accent);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all .3s;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 601;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.15);
+            background: rgba(126,231,199,0.15);
+            box-shadow: 0 0 20px rgba(126,231,199,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            border-color: rgba(126,231,199,0.4);
+        }
+
+        .icon-btn.active::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(126,231,199,0.7); }
+            50% { box-shadow: 0 0 0 6px rgba(126,231,199,0); }
+        }
+
+        /* Popup Styles */
+        .settings-popup {
+            position: fixed;
+            background: linear-gradient(135deg, rgba(255,255,255,calc(0.04 * var(--opacity))), rgba(126,231,199,calc(0.02 * var(--opacity))));
+            border: 1px solid rgba(126,231,199,calc(0.15 * var(--opacity)));
+            border-radius: 14px;
+            padding: 16px;
+            max-width: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+            z-index: 2000;
+            animation: popupSlideIn .3s ease;
+            display: none;
+            top: 60px;
+            right: 16px;
+            box-sizing: border-box;
+        }
+
+        html[dir="rtl"] .settings-popup {
+            right: 16px;
+            left: auto;
+        }
+
+        .settings-popup.active {
+            display: block;
+        }
+
+        @keyframes popupSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(126,231,199,0.1);
+        }
+
+        .popup-header h3 {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .popup-close {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform .2s;
+        }
+
+        .popup-close:hover {
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .popup-item {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .popup-item label {
+            font-size: 0.9rem;
+            color: var(--muted);
+            flex: 1;
+        }
+
+        .popup-item select,
+        .popup-item input {
+            flex: 1;
+            padding: 6px 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(126,231,199,0.1);
+            border-radius: 6px;
+            color: inherit;
+            font-size: 0.85rem;
+        }
+
+        .popup-item input[type="checkbox"],
+        .popup-item input[type="radio"] {
+            flex: none;
+            width: 16px;
+            height: 16px;
+        }
+
+        .popup-button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 8px;
+            background: linear-gradient(90deg, rgba(126,231,199,0.15), rgba(125,211,252,0.08));
+            border: 1px solid rgba(126,231,199,0.2);
+            border-radius: 6px;
+            color: inherit;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all .2s;
+        }
+
+        /* Fullscreen Budget Settings Panel */
+        .fullscreen-panel {
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            background:linear-gradient(135deg, rgba(7,16,32,0.95), rgba(20,40,80,0.95));
+            backdrop-filter:blur(20px);
+            z-index:3000;
+            display:none;
+            flex-direction:column;
+            overflow:hidden;
+            pointer-events:none;
+            opacity:0;
+            transition:opacity 0.3s ease, visibility 0.3s ease;
+            box-sizing:border-box;
+            width:100%;
+            height:100%;
+        }
+
+        .fullscreen-panel.active {
+            display:flex;
+            pointer-events:auto;
+            opacity:1;
+            visibility:visible;
+            animation:panelSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .fullscreen-panel.closing {
+            animation:panelSlideOut 0.3s ease-out forwards;
+        }
+
+        @keyframes panelSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes panelSlideOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 32px;
+            background: rgba(7,16,32,0.8);
+            border-bottom: 1px solid rgba(126,231,199,0.1);
+            backdrop-filter: blur(15px);
+            flex-shrink: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 2rem;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .panel-close {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: rgba(126,231,199,0.1);
+            border-radius: 50%;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .3s;
+        }
+
+        .panel-close:hover {
+            background: rgba(126,231,199,0.2);
+            transform: scale(1.1);
+        }
+
+        .panel-content {
+            padding: 32px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-bottom: 120px;
+            flex: 1;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        /* Budget Steps & Workflow */
+        .budget-step {
+            background: linear-gradient(135deg, rgba(255,255,255,calc(0.05 * var(--opacity))), rgba(126,231,199,calc(0.02 * var(--opacity))));
+            border: 1px solid rgba(126,231,199,calc(0.15 * var(--opacity)));
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: all .3s ease;
+        }
+
+        .budget-step:hover {
+            background: linear-gradient(135deg, rgba(255,255,255,calc(0.08 * var(--opacity))), rgba(126,231,199,calc(0.04 * var(--opacity))));
+            border-color: rgba(126,231,199,calc(0.25 * var(--opacity)));
+            box-shadow: 0 12px 48px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(126,231,199,0.2);
+            border: 2px solid rgba(126,231,199,0.5);
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .step-title {
+            margin: 0;
+            color: var(--accent);
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .step-content {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Period Selector */
+        .period-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .period-btn {
+            padding: 14px 16px;
+            border: 2px solid rgba(126,231,199,0.2);
+            background: rgba(126,231,199,0.05);
+            border-radius: 12px;
+            color: var(--muted);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all .3s ease;
+            white-space: nowrap;
+        }
+
+        .period-btn:hover {
+            border-color: rgba(126,231,199,0.4);
+            background: rgba(126,231,199,0.1);
+        }
+
+        .period-btn.active {
+            border-color: var(--accent);
+            background: rgba(126,231,199,0.25);
+            color: var(--accent);
+            box-shadow: 0 0 16px rgba(126,231,199,0.3);
+        }
+
+        .period-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            padding: 16px;
+            background: rgba(126,231,199,0.05);
+            border-radius: 12px;
+            margin-top: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .stat-value {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: block;
+        }
+
+        /* Custom Date Range */
+        .date-range-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .date-input-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .date-input-wrapper label {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        /* Calculations Grid */
+        .calculations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .calc-card {
+            background: rgba(126,231,199,0.08);
+            border: 1px solid rgba(126,231,199,0.15);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all .3s ease;
+        }
+
+        .calc-card:hover {
+            background: rgba(126,231,199,0.12);
+            border-color: rgba(126,231,199,0.3);
+        }
+
+        .calc-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .calc-label {
+            color: var(--muted);
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .calc-value {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.25rem;
+            display: block;
+        }
+
+        /* Progress Bar Large */
+        .progress-bar-large {
+            width: 100%;
+            height: 12px;
+            background: rgba(126,231,199,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 16px 0 8px 0;
+            border: 1px solid rgba(126,231,199,0.15);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7EE7C7, #5DD4B4);
+            border-radius: 6px;
+            transition: width .6s ease;
+            width: 0%;
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #FFA500, #FF8C00);
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #FF6B6B, #EE5A52);
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(126,231,199,0.08);
+            border-left: 4px solid rgba(126,231,199,0.5);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-top: 12px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .info-box.warning {
+            background: rgba(255,165,0,0.08);
+            border-left-color: rgba(255,165,0,0.5);
+        }
+
+        .info-box.danger {
+            background: rgba(255,107,107,0.08);
+            border-left-color: rgba(255,107,107,0.5);
+        }
+
+        .info-icon {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .info-text {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: var(--muted);
+        }
+
+        /* Collapsible Sections */
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 14px;
+            background: rgba(126,231,199,0.08);
+            border-radius: 10px;
+            transition: all .3s ease;
+            user-select: none;
+        }
+
+        .collapsible-header:hover {
+            background: rgba(126,231,199,0.12);
+        }
+
+        .collapsible-title {
+            color: var(--accent);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .collapsible-icon {
+            font-size: 1.2rem;
+            transition: transform .3s ease;
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .3s ease;
+            padding: 0;
+        }
+
+        .collapsible-content.active {
+            max-height: 2000px;
+            padding: 16px 0;
+        }
+
+        .collapsible-body {
+            padding: 16px;
+            background: rgba(126,231,199,0.04);
+            border-radius: 10px;
+            margin-top: 8px;
+        }
+
+        /* Input Groups */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            padding: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(126,231,199,0.15);
+            border-radius: 8px;
+            color: inherit;
+            font-size: 1rem;
+            transition: all .2s;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline: none;
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(126,231,199,0.4);
+            box-shadow: 0 0 12px rgba(126,231,199,0.2);
+        }
+
+        .input-with-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-with-icon input {
+            padding-right: 32px;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 12px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        /* Checkbox Groups */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(126,231,199,0.04);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(126,231,199,0.08);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-top: 4px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .checkbox-label {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .checkbox-label strong {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .checkbox-description {
+            color: var(--muted);
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+
+        /* Action Buttons */
+        .panel-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding: 16px 32px;
+            background: rgba(7,16,32,0.95);
+            border-top: 1px solid rgba(126,231,199,0.1);
+            backdrop-filter: blur(15px);
+            flex-shrink: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn-secondary {
+            padding: 14px;
+            background: rgba(126,231,199,0.1);
+            border: 1px solid rgba(126,231,199,0.2);
+            border-radius: 10px;
+            color: var(--muted);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all .3s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(126,231,199,0.15);
+            border-color: rgba(126,231,199,0.3);
+        }
+
+        .btn-primary {
+            padding: 14px;
+            background: linear-gradient(90deg, rgba(126,231,199,0.3), rgba(125,211,252,0.2));
+            border: 1px solid rgba(126,231,199,0.4);
+            border-radius: 10px;
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all .3s;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(90deg, rgba(126,231,199,0.4), rgba(125,211,252,0.3));
+            border-color: rgba(126,231,199,0.6);
+            box-shadow: 0 0 20px rgba(126,231,199,0.3);
+        }
+
+        /* Dynamic Add Button */
+        .add-btn {
+            padding: 10px 16px;
+            background: rgba(126,231,199,0.15);
+            border: 1px solid rgba(126,231,199,0.3);
+            border-radius: 8px;
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all .2s;
+            width: 100%;
+            text-align: center;
+        }
+
+        .add-btn:hover {
+            background: rgba(126,231,199,0.25);
+            border-color: rgba(126,231,199,0.5);
+        }
+
+        /* Light Mode Styling */
+        @media (prefers-color-scheme: light) {
+            body { color: #1a1a1a; }
+            .brand { color: #2d9d78; }
+            h1 { background: linear-gradient(90deg, #1a1a1a, #2d9d78); -webkit-text-fill-color: transparent; }
+            .glass { background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(200,220,220,0.7)); border: 1px solid rgba(45,157,120,0.2); }
+            .glass:hover { border-color: rgba(45,157,120,0.4); box-shadow: 0 12px 40px rgba(45,157,120,0.15); }
+            .topbar { background: rgba(255,255,255,0.8); border-bottom: 1px solid rgba(45,157,120,0.15); }
+            .modal { background: rgba(255,255,255,0.85); }
+            .modal-content { background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,245,245,0.9)); }
+            .settings-popup { background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,245,245,0.9)); }
+            .add-transaction-modal { background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,245,245,0.9)); }
+            input, select, textarea { background: rgba(255,255,255,0.9); border: 1px solid rgba(45,157,120,0.2); color: #1a1a1a; }
+            input:focus, select:focus, textarea:focus { border-color: #2d9d78; box-shadow: 0 0 0 3px rgba(45,157,120,0.15); }
+            .btn { background: rgba(255,255,255,0.7); border: 1px solid rgba(45,157,120,0.2); color: #1a1a1a; }
+            .btn:hover { background: rgba(240,245,245,0.9); border-color: rgba(45,157,120,0.4); }
+            .btn-primary { background: linear-gradient(90deg, rgba(45,157,120,0.2), rgba(45,157,120,0.15)); color: #1a1a1a; }
+            .footer { background: rgba(255,255,255,0.5); border-top: 1px solid rgba(45,157,120,0.15); }
+            .info-box { background: rgba(45,157,120,0.08); border-left-color: rgba(45,157,120,0.5); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .panel-content {
+                padding: 24px;
+            }
+
+            .budget-step {
+                padding: 20px;
+            }
+
+            .calculations-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .period-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .panel-header {
+                padding: 16px 20px;
+            }
+
+            .panel-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .panel-content {
+                padding: 16px;
+                padding-bottom: 100px;
+            }
+
+            .budget-step {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+
+            .step-header {
+                gap: 12px;
+            }
+
+            .step-number {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .step-title {
+                font-size: 1.1rem;
+            }
+
+            .calculations-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .calc-card {
+                padding: 12px;
+            }
+
+            .period-selector {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .period-btn {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+
+            .date-range-group {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-actions {
+                grid-template-columns: 1fr;
+                padding: 12px 16px;
+                gap: 12px;
+            }
+
+            .btn-secondary,
+            .btn-primary {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .panel-header {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+
+            .panel-header h2 {
+                font-size: 1.3rem;
+            }
+
+            .panel-content {
+                padding: 12px;
+            }
+
+            .budget-step {
+                padding: 12px;
+            }
+
+            .step-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+            }
+
+            .step-number {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+
+            .calculations-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .period-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .period-stats {
+                grid-template-columns: 1fr;
+            }
+
+            /* Mobile optimizations */
+            html, body {
+                width: 100%;
+                overflow-x: hidden;
+            }
+
+            .page {
+                min-height: 100vh;
+                width: 100%;
+            }
+
+            .topbar {
+                padding: 10px 12px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .topbar > div:first-child {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .dashboard-icons {
+                width: 100%;
+                justify-content: space-around;
+                gap: 4px;
+            }
+
+            .icon-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+                flex-shrink: 0;
+            }
+
+            .main {
+                padding: 16px 12px;
+                min-height: calc(100vh - 120px);
+            }
+
+            .card {
+                max-width: 100%;
+                padding: 16px;
+                border-radius: 12px;
+                margin: 0;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+                margin: 0 0 8px 0;
+            }
+
+            p.lead {
+                font-size: 0.9rem;
+            }
+
+            /* Settings popup mobile */
+            .settings-popup {
+                position: fixed;
+                max-width: 90vw;
+                right: 5vw;
+                left: auto;
+                top: 50px;
+                max-height: 70vh;
+                border-radius: 12px;
+            }
+
+            html[dir="rtl"] .settings-popup {
+                right: 5vw;
+                left: auto;
+            }
+
+            /* Transaction cards mobile */
+            section[style*="grid-template-columns:repeat"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            .glass {
+                padding: 14px;
+                border-radius: 10px;
+            }
+
+            /* Modal mobile */
+            .add-transaction-modal {
+                max-width: 95vw;
+                padding: 16px;
+                width: 95vw;
+                max-height: 90vh;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.95);
+            }
+
+            .add-transaction-modal.active {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            .modal-title {
+                font-size: 1.3rem;
+                margin-bottom: 16px;
+            }
+
+            .form-group {
+                margin: 12px 0;
+            }
+
+            .form-group label {
+                font-size: 0.85rem;
+                margin-bottom: 6px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 10px;
+                font-size: 16px;
+            }
+
+            .transaction-type-toggle {
+                gap: 10px;
+                margin: 14px 0;
+            }
+
+            .type-btn {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            .modal-buttons {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-top: 16px;
+            }
+
+            .btn-cancel, .btn-save {
+                padding: 11px;
+                font-size: 0.9rem;
+            }
+
+            /* Floating button mobile */
+            #addTransactionBtn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+                bottom: 16px;
+                right: 16px;
+            }
+
+            /* Transaction list mobile */
+            #txList {
+                max-height: 400px !important;
+                padding: 10px !important;
+            }
+
+            #txList > div {
+                padding: 10px !important;
+                margin-bottom: 8px !important;
+            }
+
+            /* Button improvements for touch */
+            .btn, .add-btn, .btn-primary, .btn-secondary {
+                min-height: 44px;
+                padding: 12px 14px;
+                font-size: 0.95rem;
+                border-radius: 10px;
+            }
+
+            .icon-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            /* Input fields - larger for touch */
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            input[type="number"],
+            input[type="date"],
+            select,
+            textarea {
+                min-height: 44px;
+                font-size: 16px;
+                padding: 11px;
+                border-radius: 8px;
+            }
+
+            /* Prevent zoom on input focus */
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            input[type="number"],
+            input[type="date"],
+            select,
+            textarea {
+                font-size: 16px;
+            }
+
+            /* Safe area for notched phones */
+            .topbar {
+                padding-top: max(10px, env(safe-area-inset-top));
+                padding-right: max(12px, env(safe-area-inset-right));
+                padding-left: max(12px, env(safe-area-inset-left));
+            }
+
+            .footer {
+                padding-bottom: max(12px, env(safe-area-inset-bottom));
+            }
+
+            /* Transaction display improvements */
+            .transactionCountBadge {
+                font-size: 0.85rem;
+            }
+
+            /* Ensure text is readable */
+            body {
+                font-size: 14px;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            h3 {
+                font-size: 1rem;
+            }
+
+            /* Fix overflow on small screens */
+            .page {
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            /* Banner improvements */
+            .banner {
+                padding: 10px;
+                margin: 12px 0;
+                font-size: 0.85rem;
+            }
+
+            /* Collapsible on mobile */
+            .collapsible-header {
+                padding: 12px;
+            }
+
+            .collapsible-title {
+                font-size: 0.95rem;
+            }
+
+            /* Currency styles removed (app uses single currency) */
+
+            /* Info boxes */
+            .info-box {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+                gap: 8px;
+            }
+
+            .info-icon {
+                font-size: 0.9rem;
+                flex-shrink: 0;
+            }
+
+            /* Period selector mobile */
+            .period-btn {
+                padding: 10px;
+                font-size: 0.85rem;
+                white-space: normal;
+            }
+
+            /* Calculation cards mobile */
+            .calc-card {
+                padding: 12px;
+            }
+
+            .calc-icon {
+                font-size: 1.3rem;
+                margin-bottom: 6px;
+            }
+
+            .calc-label {
+                font-size: 0.75rem;
+            }
+
+            .calc-value {
+                font-size: 1.1rem;
+            }
+
+            /* Progress bar mobile */
+            .progress-bar-large {
+                height: 10px;
+                margin: 12px 0 6px 0;
+            }
+
+            .progress-info {
+                font-size: 0.8rem;
+            }
+
+            /* Checkbox improvements */
+            .checkbox-item {
+                padding: 10px;
+            }
+
+            .checkbox-item input[type="checkbox"] {
+                width: 20px;
+                height: 20px;
+                min-width: 20px;
+            }
+
+            .checkbox-label {
+                gap: 4px;
+            }
+
+            .checkbox-label strong {
+                font-size: 0.95rem;
+            }
+
+            .checkbox-description {
+                font-size: 0.8rem;
+            }
+
+            /* Budget panel buttons mobile */
+            .panel-actions {
+                grid-template-columns: 1fr;
+                padding: 12px 16px;
+                gap: 10px;
+            }
+
+            .btn-secondary, .btn-primary {
+                padding: 11px;
+                font-size: 0.9rem;
+            }
+
+            /* Range input mobile */
+            input[type="range"] {
+                height: 8px;
+            }
+
+            input[type="range"]::-webkit-slider-thumb {
+                width: 20px;
+                height: 20px;
+            }
+
+            input[type="range"]::-moz-range-thumb {
+                width: 20px;
+                height: 20px;
+            }
+
+            /* Date range group mobile */
+            .date-range-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Add Transaction Modal */
+        .add-transaction-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            background: linear-gradient(135deg, rgba(255,255,255,calc(0.08 * var(--opacity))), rgba(126,231,199,calc(0.03 * var(--opacity))));
+            border: 1px solid rgba(126,231,199,calc(0.2 * var(--opacity)));
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 400px;
+            width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+            z-index: 3500;
+            display: none;
+            animation: modalSlideIn .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .add-transaction-modal.active {
+            display: block;
+            animation: modalSlideIn .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .modal-title {
+            margin: 0 0 20px 0;
+            color: var(--accent);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .modal-close-btn:hover {
+            color: var(--accent);
+            transform: scale(1.2);
+        }
+
+        .form-group {
+            margin: 16px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(126,231,199,0.15);
+            border-radius: 8px;
+            color: inherit;
+            font-size: 1rem;
+            transition: all .2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(126,231,199,0.4);
+            box-shadow: 0 0 12px rgba(126,231,199,0.15);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .transaction-type-toggle {
+            display: flex;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid rgba(126,231,199,0.2);
+            background: rgba(126,231,199,0.05);
+            border-radius: 8px;
+            color: var(--muted);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all .3s;
+        }
+
+        .type-btn.active {
+            border-color: var(--accent);
+            background: rgba(126,231,199,0.2);
+            color: var(--accent);
+            box-shadow: 0 0 16px rgba(126,231,199,0.3);
+        }
+
+        .modal-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-cancel {
+            padding: 12px;
+            background: rgba(126,231,199,0.1);
+            border: 1px solid rgba(126,231,199,0.2);
+            border-radius: 8px;
+            color: var(--muted);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all .2s;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(126,231,199,0.15);
+            border-color: rgba(126,231,199,0.3);
+        }
+
+        .btn-save {
+            padding: 12px;
+            background: linear-gradient(90deg, rgba(126,231,199,0.3), rgba(125,211,252,0.2));
+            border: 1px solid rgba(126,231,199,0.4);
+            border-radius: 8px;
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: 700;
+            transition: all .2s;
+        }
+
+        .btn-save:hover {
+            background: linear-gradient(90deg, rgba(126,231,199,0.4), rgba(125,211,252,0.3));
+            border-color: rgba(126,231,199,0.6);
+            box-shadow: 0 0 20px rgba(126,231,199,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .panel-header {
+                padding: 16px 20px;
+            }
+
+            .panel-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .panel-content {
+                padding: 16px;
+            }
+
+            .budget-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .add-transaction-modal {
+                max-width: 95vw;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:12px">
+                <div class="glass" style="display:flex;align-items:center;gap:12px;padding:8px 12px">
+                    <div class="brand">הכסף שלי</div>
+                    <div style="font-size:0.9rem;color:#bfcbd8">v1.01</div>
+                </div>
+                <div class="glass" style="padding:6px 10px"> 
+                    <label for="loginDrop">כניסה</label>
+                    <button id="authBtn" style="width:auto">הרשמה / כניסה</button>
+                </div>
+            </div>
+
+            <!-- Tip container (top-right) -->
+            <div id="tipContainer" style="position:fixed;top:18px;right:18px;z-index:1200;min-width:260px;max-width:360px;display:none">
+                <div id="tipBox" class="glass" style="padding:12px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.45);">
+                    <div id="tipText" style="font-size:0.98rem;color:#e8f6ee;line-height:1.3"></div>
+                </div>
+            </div>
+
+            <!-- Floating Dashboard Icons -->
+            <div class="dashboard-icons">
+                <button class="icon-btn" id="icon-budget" title="תקציב" onclick="openBudgetPanel()">💰</button>
+                <button class="icon-btn" id="icon-design" title="עיצוב" onclick="openPopup('design-popup')">🎨</button>
+                <button class="icon-btn" id="icon-language" title="חשבון:" onclick="openPopup('language-popup')">🌍</button>
+                <button class="icon-btn" id="icon-notifications" title="התראות" onclick="openPopup('notifications-popup')">🔔</button>
+                <button class="icon-btn" id="icon-tips" title="טיפים" onclick="openPopup('tips-popup')">💡</button>
+                <button class="icon-btn" id="icon-account" title="חשבון" onclick="openPopup('account-popup')">👤</button>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="card glass">
+                <h1>הכסף שלי</h1>
+                <p class="lead">גרסה 1.01 
+
+                </p>
+
+            
+
+                <section style="margin-top:18px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+                    <div class="glass" style="padding:16px">
+                        <strong>תקציב — סיכום מהיר</strong>
+                        <div id="budgetInfo" style="margin-top:8px;color:var(--muted)">אין נתונים עדיין</div>
+                        <div style="margin-top:10px;display:flex;gap:8px">
+                            <button class="btn" onclick="openBudgetPanel()">נהל תקציב</button>
+                            <button class="btn" onclick="updateAllCalculations()">רענן חישובים</button>
+                        </div>
+                    </div>
+
+                    <div class="glass" style="padding:16px">
+                        <strong>יעדי חיסכון</strong>
+                        <div id="goalsInfo" style="margin-top:8px;color:var(--muted)">אין יעדים עדיין</div>
+                        <div style="margin-top:10px;display:flex;gap:8px">
+                            <button class="btn" onclick="openBudgetPanel()">ניהול יעדים</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Expense & Income Tracking Section (Large & Beautiful) -->
+                <section style="margin-top:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+                    <!-- Expense Tracker Card -->
+                    <div class="glass" style="padding:22px;border-radius:16px;background:linear-gradient(135deg, rgba(255,99,99,0.08), rgba(255,99,99,0.02));border:1px solid rgba(255,99,99,0.15)">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+                            <span style="font-size:1.8rem">💸</span>
+                            <h3 style="margin:0;color:var(--accent);font-size:1.1rem;font-weight:600">הוצאות</h3>
+                        </div>
+                        <div style="background:rgba(255,99,99,0.05);padding:14px;border-radius:12px;margin-bottom:14px;border:1px solid rgba(255,99,99,0.1)">
+                            <p style="margin:0 0 8px 0;color:var(--muted);font-size:0.85rem">סה"כ הוצאות</p>
+                            <p style="margin:0;color:#FF6B6B;font-size:1.6rem;font-weight:700" id="totalExpensesDisplay">0 ₪</p>
+                        </div>
+                        <button class="add-btn" onclick="openAddTransactionModal('expense')" style="background:rgba(255,99,99,0.15);border-color:rgba(255,99,99,0.3)">+ הוסף הוצאה</button>
+                    </div>
+
+                    <!-- Income Tracker Card -->
+                    <div class="glass" style="padding:22px;border-radius:16px;background:linear-gradient(135deg, rgba(72,187,120,0.08), rgba(72,187,120,0.02));border:1px solid rgba(72,187,120,0.15)">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+                            <span style="font-size:1.8rem">💰</span>
+                            <h3 style="margin:0;color:var(--accent);font-size:1.1rem;font-weight:600">הכנסות</h3>
+                        </div>
+                        <div style="background:rgba(72,187,120,0.05);padding:14px;border-radius:12px;margin-bottom:14px;border:1px solid rgba(72,187,120,0.1)">
+                            <p style="margin:0 0 8px 0;color:var(--muted);font-size:0.85rem">סה"כ הכנסות</p>
+                            <p style="margin:0;color:#48BB78;font-size:1.6rem;font-weight:700" id="totalIncomeDisplay">0 ₪</p>
+                        </div>
+                        <button class="add-btn" onclick="openAddTransactionModal('income')" style="background:rgba(72,187,120,0.15);border-color:rgba(72,187,120,0.3)">+ הוסף הכנסה</button>
+                    </div>
+
+                    <!-- Net Balance Card -->
+                    <div class="glass" style="padding:22px;border-radius:16px;background:linear-gradient(135deg, rgba(126,231,199,0.08), rgba(126,231,199,0.02));border:1px solid rgba(126,231,199,0.15)">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+                            <span style="font-size:1.8rem">📊</span>
+                            <h3 style="margin:0;color:var(--accent);font-size:1.1rem;font-weight:600">יתרה נטו</h3>
+                        </div>
+                        <div style="background:rgba(126,231,199,0.05);padding:14px;border-radius:12px;border:1px solid rgba(126,231,199,0.1)">
+                            <p style="margin:0 0 8px 0;color:var(--muted);font-size:0.85rem">הכנסות - הוצאות</p>
+                            <p style="margin:0;color:var(--accent);font-size:1.6rem;font-weight:700" id="netBalanceDisplay">0 ₪</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Recent Transactions List (Large & Clear) -->
+                <section style="margin-top:24px">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+                        <span style="font-size:1.5rem">📝</span>
+                        <h2 style="margin:0;color:var(--accent);font-size:1.2rem;font-weight:600">עסקאות אחרונות</h2>
+                        <span style="color:var(--muted);font-size:0.9rem" id="transactionCountBadge">(0)</span>
+                    </div>
+                    <div id="txList" class="glass" style="padding:14px;border-radius:12px;max-height:320px;overflow-y:auto;min-height:60px"></div>
+                </section>
+            </div>
+        </main>
+
+        <footer class="footer">All Winnings Reserved 2025 Built by Ido Credit to the Baskets</footer>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeAuthModal()">×</button>
+            <h2 id="authTitle">הרשמה / כניסה</h2>
+            
+            <div id="loginForm" style="display:block">
+                <input type="email" id="loginEmail" placeholder="דואר אלקטרוני" />
+                <input type="password" id="loginPassword" placeholder="סיסמה" />
+                <button id="loginBtn" onclick="handleLogin()">כניסה</button>
+                <div id="loginError" class="error-msg"></div>
+            </div>
+
+            <div id="signupForm" style="display:none">
+                <input type="email" id="signupEmail" placeholder="דואר אלקטרוני" />
+                <input type="text" id="signupUsername" placeholder="שם משתמש" />
+                <input type="password" id="signupPassword" placeholder="סיסמה" />
+                <input type="password" id="signupConfirm" placeholder="אישור סיסמה" />
+                <button id="signupBtn" onclick="handleSignup()">הרשמה</button>
+                <div id="signupError" class="error-msg"></div>
+            </div>
+
+            <div class="modal-toggle">
+                <button onclick="switchToLogin()">כניסה</button>
+                <button onclick="switchToSignup()">הרשמה</button>
+                <button onclick="handleGuestMode()">אורח</button>
+            </div>
+
+            <button onclick="handleGoogleLogin()" style="width:100%;margin-top:16px;padding:10px;border:1px solid rgba(255,255,255,0.2)">כניסה עם Google</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal (Redesigned - Clean & Simple) -->
+    <!-- FULLSCREEN BUDGET SETTINGS PANEL -->
+    <div id="budget-fullscreen" class="fullscreen-panel">
+        <div class="panel-header">
+            <div>
+                <h2>💰 הגדרות תקציב חכם</h2>
+                <p style="margin: 4px 0 0 0; color: var(--muted); font-size: 0.9rem;">בנה את תקציבך צעד אחר צעד</p>
+            </div>
+            <button class="panel-close" onclick="closeBudgetPanel()">×</button>
+        </div>
+
+        <div class="panel-content">
+            <!-- STEP 1: SET TOTAL BUDGET -->
+            <div class="budget-step">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">הגדר סכום תקציב כולל</h3>
+                </div>
+
+                <div class="step-content">
+                    <div class="input-group">
+                        <label>סכום התקציב</label>
+                        <div class="input-with-icon">
+                            <input type="number" id="totalBudgetInput" placeholder="5000" min="0" step="100" onchange="updateAllCalculations()" />
+                            <span class="input-icon">₪</span>
+                        </div>
+                        <small style="color: var(--muted);">דוגמה: תקציב חודשי שלך</small>
+                    </div>
+
+                    <div class="info-box">
+                        <span class="info-icon">💡</span>
+                        <span class="info-text">הגדרת תקציב כולל היא הבסיס לכל התכניות שלך</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: SET TIME RANGE -->
+            <div class="budget-step">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">בחר טווח זמן</h3>
+                </div>
+
+                <div class="step-content">
+                    <div class="period-selector">
+                        <button class="period-btn active" data-period="daily" onclick="setPeriod('daily')">📅 יומי</button>
+                        <button class="period-btn" data-period="weekly" onclick="setPeriod('weekly')">📆 שבועי</button>
+                        <button class="period-btn" data-period="monthly" onclick="setPeriod('monthly')">📊 חודשי</button>
+                        <button class="period-btn" data-period="custom" onclick="setPeriod('custom')">📍 מותאם</button>
+                    </div>
+
+                    <!-- Custom Date Range (Hidden by default) -->
+                    <div id="customDateRange" style="display: none; margin-top: 16px;">
+                        <div class="date-range-group">
+                            <div class="date-input-wrapper">
+                                <label>תאריך התחלה</label>
+                                <input type="date" id="customStartDate" onchange="updateAllCalculations()" />
+                            </div>
+                            <div class="date-input-wrapper">
+                                <label>תאריך סיום</label>
+                                <input type="date" id="customEndDate" onchange="updateAllCalculations()" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Period Info Display -->
+                    <div class="period-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">ימים בתקופה</span>
+                            <span class="stat-value" id="totalDaysInPeriod">30</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">ימים שנותרו</span>
+                            <span class="stat-value" id="remainingDaysInPeriod">30</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">אחוז בתקופה</span>
+                            <span class="stat-value" id="periodProgress">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: AUTOMATIC CALCULATIONS -->
+            <div class="budget-step">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">חישובים אוטומטיים</h3>
+                </div>
+
+                <div class="step-content">
+                    <div class="calculations-grid">
+                        <div class="calc-card">
+                            <div class="calc-icon">💵</div>
+                            <span class="calc-label">הקצאה יומית</span>
+                            <span class="calc-value" id="calcDaily">0 ₪</span>
+                        </div>
+
+                        <div class="calc-card">
+                            <div class="calc-icon">📊</div>
+                            <span class="calc-label">הקצאה שבועית</span>
+                            <span class="calc-value" id="calcWeekly">0 ₪</span>
+                        </div>
+
+                        <div class="calc-card">
+                            <div class="calc-icon">💳</div>
+                            <span class="calc-label">הוצאות עד כה</span>
+                            <span class="calc-value" id="calcSpent">0 ₪</span>
+                        </div>
+
+                        <div class="calc-card">
+                            <div class="calc-icon">🎯</div>
+                            <span class="calc-label">יתרה זמינה</span>
+                            <span class="calc-value" id="calcBalance">0 ₪</span>
+                        </div>
+                    </div>
+
+                    <!-- Spending Progress -->
+                    <div style="margin-top: 20px;">
+                        <label style="display: block; margin-bottom: 8px; color: var(--muted); font-weight: 500;">קצב הוצאות</label>
+                        <div id="budgetProgressBar" class="progress-bar-large">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span>0% הוצאה</span>
+                            <span>100% זמין</span>
+                        </div>
+                    </div>
+
+                    <!-- Prediction Alert -->
+                    <div class="info-box" id="predictionBox">
+                        <span class="info-icon">ℹ️</span>
+                        <span class="info-text">הגדר תקציב כדי לקבל חיזוי</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 4: SAVINGS GOALS (OPTIONAL) -->
+            <div class="budget-step">
+                <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <div class="step-number">4</div>
+                        <h3 class="collapsible-title">יעדי חיסכון (אופציונלי)</h3>
+                    </div>
+                    <span class="collapsible-icon">▼</span>
+                </div>
+
+                <div class="collapsible-content">
+                    <div class="collapsible-body">
+                        <div style="display: grid; gap: 12px;">
+                            <div class="input-group">
+                                <label>שם היעד</label>
+                                <input type="text" id="savingsGoalName" placeholder="למשל: חופשה בקיץ" onchange="updateAllCalculations()" />
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div class="input-group">
+                                    <label>סכום יעד</label>
+                                    <input type="number" id="savingsGoalAmount" placeholder="0" min="0" onchange="updateAllCalculations()" />
+                                </div>
+
+                                <div class="input-group">
+                                    <label>תאריך יעד</label>
+                                    <input type="date" id="savingsGoalDeadline" onchange="updateAllCalculations()" />
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label>הערות</label>
+                                <textarea id="savingsGoalNote" placeholder="פרטים נוספים..." style="min-height: 80px;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 5: CATEGORY LIMITS (OPTIONAL) -->
+            <div class="budget-step">
+                <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <div class="step-number">5</div>
+                        <h3 class="collapsible-title">מגבלות הוצאות לפי קטגוריה (אופציונלי)</h3>
+                    </div>
+                    <span class="collapsible-icon">▼</span>
+                </div>
+
+                <div class="collapsible-content">
+                    <div class="collapsible-body">
+                        <div style="display: grid; gap: 12px;">
+                            <small style="color: var(--muted);">הגדר מגבלה לכל קטגוריה ללא השפעה על התקציב הכולל</small>
+
+                            <div id="categoryLimitsContainer"></div>
+
+                            <button class="add-btn" onclick="addCategoryLimitRow()">+ הוסף קטגוריה</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SMART FEATURES -->
+            <div class="budget-step">
+                <div class="step-header">
+                    <div class="step-number">⚙️</div>
+                    <h3 class="step-title">תכונות חכמות</h3>
+                </div>
+
+                <div class="step-content">
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="autoAdjust" checked />
+                            <div class="checkbox-label">
+                                <strong>התאמה אוטומטית יומית</strong>
+                                <span class="checkbox-description">חישוב מחדש של תכסיס יומי בהתאם לקצב הוצאות</span>
+                            </div>
+                        </label>
+
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="enableAlerts" checked />
+                            <div class="checkbox-label">
+                                <strong>התראות ניהול</strong>
+                                <span class="checkbox-description">התראה כשמתקרבים ללימיט התקציב או קטגוריה</span>
+                            </div>
+                        </label>
+
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="enableGraphs" checked />
+                            <div class="checkbox-label">
+                                <strong>הצג גרפים</strong>
+                                <span class="checkbox-description">תצוגה ויזואלית של נתונים וטרנדים</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sticky Action Buttons -->
+        <div class="panel-actions">
+            <button class="btn-secondary" onclick="closeBudgetPanel()">סגור</button>
+            <button class="btn-primary" onclick="finalizeBudgetSettings()">💾 שמור הגדרות</button>
+        </div>
+    </div>
+
+    <!-- Add Transaction Modal -->
+    <div id="add-transaction-modal" class="add-transaction-modal">
+        <button class="modal-close-btn" onclick="closeAddTransactionModal()">×</button>
+        <h2 class="modal-title">הוסף עסקה</h2>
+        
+        <div class="transaction-type-toggle">
+            <button class="type-btn active" id="typeExpense" onclick="setTransactionType('expense')">💸 הוצאה</button>
+            <button class="type-btn" id="typeIncome" onclick="setTransactionType('income')">💰 הכנסה</button>
+        </div>
+
+        <div class="form-group">
+            <label>תיאור / כותרת</label>
+            <input type="text" id="txTitle" placeholder="למה הם עבורים?" />
+        </div>
+
+        <div class="form-group">
+            <label>קטגוריה</label>
+            <select id="txCategory">
+                <option value="food">🍕 אוכל</option>
+                <option value="transport">🚕 תחבורה</option>
+                <option value="entertainment">🎮 בידור</option>
+                <option value="utilities">💡 שירותים</option>
+                <option value="health">⚕️ בריאות</option>
+                <option value="work">💼 עבודה</option>
+                <option value="other">📌 אחר</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>סכום</label>
+            <input type="number" id="txAmount" placeholder="0.00" step="0.01" />
+        </div>
+
+        <div class="form-group">
+            <label>תאריך</label>
+            <input type="date" id="txDate" />
+        </div>
+
+        <div class="form-group">
+            <label>הערה (אופציונלי)</label>
+            <textarea id="txNote" placeholder="הוסף הערה..."></textarea>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="closeAddTransactionModal()">ביטול</button>
+            <button class="btn-save" onclick="saveTransaction()">שמור</button>
+        </div>
+    </div>
+
+    <!-- Add Transaction Button (Floating) -->
+    <button id="addTransactionBtn" class="icon-btn" style="position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; font-size: 1.5rem; z-index: 500; box-shadow: 0 8px 24px rgba(126,231,199,0.3);" onclick="openAddTransactionModal()" title="הוסף עסקה">➕</button>
+
+    <!-- Design Popup -->
+    <div id="design-popup" class="settings-popup">
+        <div class="popup-header">
+            <h3>🎨 עיצוב</h3>
+            <button class="popup-close" onclick="closePopup('design-popup')">×</button>
+        </div>
+        <div class="popup-item">
+            <label>ערכת צבעים</label>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
+            <label style="flex:1;min-width:80px"><input type="radio" name="theme" value="dark" checked onchange="changeTheme('dark')"> 🌙 אפל</label>
+            <label style="flex:1;min-width:80px"><input type="radio" name="theme" value="light" onchange="changeTheme('light')"> ☀️ בהיר</label>
+            <label style="flex:1;min-width:80px"><input type="radio" name="theme" value="transparent" onchange="changeTheme('transparent')"> 💎 שקוף</label>
+        </div>
+        <div class="popup-item" style="margin-top:12px">
+            <label>שקיפות זכוכית</label>
+            <input type="range" id="glassOpacity" min="0.2" max="1" step="0.05" value="1" onchange="updateGlassOpacity()" />
+        </div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-top:8px">
+            אחוז: <span id="opacityValue">100%</span>
+        </div>
+    </div>
+
+    <!-- Language Popup -->
+    <div id="language-popup" class="settings-popup">
+        <div class="popup-header">
+            <h3>🌍 שפה</h3>
+            <button class="popup-close" onclick="closePopup('language-popup')">×</button>
+        </div>
+        <div class="popup-item">
+            <select id="settingsLang" onchange="changeLanguageSetting()">
+                <option value="he">עברית</option>
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+                <option value="ru">Русский</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Notifications Popup -->
+    <div id="notifications-popup" class="settings-popup">
+        <div class="popup-header">
+            <h3>🔔 התראות</h3>
+            <button class="popup-close" onclick="closePopup('notifications-popup')">×</button>
+        </div>
+        <div class="popup-item">
+            <input type="checkbox" id="enableNotif" checked onchange="toggleNotifications()" />
+            <label>הפעל התראות</label>
+        </div>
+        <!-- Primary currency selection removed (app now uses a single default currency symbol) -->
+    </div>
+
+    <!-- Tips Popup -->
+    <div id="tips-popup" class="settings-popup">
+        <div class="popup-header">
+            <h3>💡 טיפים</h3>
+            <button class="popup-close" onclick="closePopup('tips-popup')">×</button>
+        </div>
+        <div class="popup-item">
+            <input type="checkbox" id="enableTips2" checked onchange="toggleTipsGeneral()" />
+            <label>הראה טיפים</label>
+        </div>
+        <div class="popup-item">
+            <label>משך הצגה</label>
+            <input type="range" id="tipsDuration2" min="5" max="60" value="25" onchange="updateTipsDuration2()" />
+        </div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-top:8px">
+            <span id="durationValue2">25</span> שניות
+        </div>
+    </div>
+
+    <!-- Account Popup -->
+    <div id="account-popup" class="settings-popup">
+        <div class="popup-header">
+            <h3>👤 חשבון</h3>
+            <button class="popup-close" onclick="closePopup('account-popup')">×</button>
+        </div>
+        <div class="popup-item">
+            <label>מצב התחברות</label>
+        </div>
+        <div style="font-size:0.85rem;color:var(--muted);margin:8px 0;padding:8px;background:rgba(126,231,199,0.05);border-radius:6px;border:1px solid rgba(126,231,199,0.1)">
+            <span id="accountStatus">אורח</span>
+        </div>
+        <button class="popup-button" onclick="logOutUser()">התנתקות</button>
+    </div>
+
+    <script>
+        const translations = {
+            he: {
+                brand: 'הכסף שלי',
+                prototype: 'v1.01',
+                login: 'כניסה',
+                signInUp: 'הרשמה / כניסה',
+                continueGuest: 'המשך כאורח',
+                googleLogin: 'כניסה עם Google',
+                language: 'שפה:',
+                tipsOn: 'טיפים: פעיל',
+                tipsOff: 'טיפים: כבוי',
+                notifications: 'הודעות',
+                welcome: 'ברוכים הבאים ל־הכסף שלי',
+                intro: 'אב טיפוס אלגנטי של מנהל תקציב עם סגנון זכוכית. דף זה מוגש על ידי שרת Python מקומי.',
+                loading: 'טוען הגדרות…',
+                currency: 'מטבע',
+                noCurrencies: 'עדיין לא הוגדרו מטבעות',
+                budget: 'תקציב',
+                noData: 'אין נתונים עדיין',
+                savingsGoals: 'יעדי חיסכון',
+                noGoals: 'אין יעדים עדיין',
+                footer: 'All Winnings Reserved 2025 Built by Ido Credit to the Baskets',
+                configNotSet: 'מפתחות Supabase לא הוגדרו. הוסיפו מפתחות לקובץ <code>.env</code> המקומי. ראו README לוהוראות.',
+                configDetected: 'הגדרות Supabase זוהו. מוכן להשתלבות (מפתחות מוסתרים).',
+                configError: 'כישלון בטעינת נקודת ה־config: ',
+                loginSuccess: 'כנסת בהצלחה!',
+                signupSuccess: 'נרשמת בהצלחה!',
+                guestMode: 'מצב אורח מופעל',
+                passwordMismatch: 'הסיסמאות לא תואמות',
+                requiredFields: 'יש למלא את כל השדות',
+                loginError: 'כישלון בכניסה',
+                signupError: 'כישלון בהרשמה',
+                logout: 'התנתקות',
+                signupLoginBtnText: 'הרשמה / כניסה',
+                settings: 'הגדרות',
+                appearance: 'תצוגה',
+                currency_label: 'מטבע',
+                notifications_label: 'הודעות',
+                tips_label: 'טיפים'
+            },
+            en: {
+                brand: 'My Money',
+                prototype: 'v1.01',
+                login: 'Login',
+                signInUp: 'Sign in / Sign up',
+                continueGuest: 'Continue as guest',
+                googleLogin: 'Google (Supabase)',
+                language: 'Language:',
+                tipsOn: 'Tips: On',
+                tipsOff: 'Tips: Off',
+                notifications: 'Notifications',
+                welcome: 'Welcome to My Money',
+                intro: 'A clean budgeting prototype. This page is a frontend skeleton served by a local Python server.',
+                loading: 'Loading configuration…',
+                currency: 'Currency',
+                noCurrencies: 'No currencies configured yet',
+                budget: 'Budget',
+                noData: 'No data yet',
+                savingsGoals: 'Savings Goals',
+                noGoals: 'No goals yet',
+                footer: 'All Winnings Reserved 2025 Built by Ido Credit to the Baskets',
+                configNotSet: 'Supabase keys are not configured. Add keys to the local <code>.env</code>. See README for instructions.',
+                configDetected: 'Supabase configuration detected. Ready to integrate (keys not shown).',
+                configError: 'Failed to load config endpoint: ',
+                loginSuccess: 'Logged in successfully!',
+                signupSuccess: 'Signed up successfully!',
+                guestMode: 'Guest mode enabled',
+                passwordMismatch: 'Passwords do not match',
+                requiredFields: 'Please fill in all fields',
+                loginError: 'Login failed',
+                signupError: 'Sign up failed',
+                logout: 'Logout',
+                signupLoginBtnText: 'Sign in / Sign up',
+                settings: 'Settings',
+                appearance: 'Appearance',
+                currency_label: 'Currency',
+                notifications_label: 'Notifications',
+                tips_label: 'Tips'
+            },
+            ar: {
+                brand: 'My Money',
+                prototype: 'v1.01',
+                login: 'تسجيل الدخول',
+                signInUp: 'تسجيل / دخول',
+                continueGuest: 'متابعة كضيف',
+                googleLogin: 'Google (Supabase)',
+                language: 'اللغة:',
+                tipsOn: 'نصائح: مفعل',
+                tipsOff: 'نصائح: معطل',
+                notifications: 'إخطارات',
+                welcome: 'Welcome to My Money',
+                intro: 'A clean budgeting prototype. This page is a frontend skeleton served by a local Python server.',
+                loading: 'جاري تحميل التكوين...',
+                currency: 'العملة',
+                noCurrencies: 'لم يتم تكوين عملات حتى الآن',
+                budget: 'الميزانية',
+                noData: 'لا توجد بيانات حتى الآن',
+                savingsGoals: 'أهداف التوفير',
+                noGoals: 'لا توجد أهداف حتى الآن',
+                footer: 'All Winnings Reserved 2025 Built by Ido Credit to the Baskets',
+                configNotSet: 'لم يتم تكوين مفاتيح Supabase. أضف المفاتيح إلى ملف <code>.env</code> المحلي. انظر README للحصول على التعليمات.',
+                configDetected: 'تم الكشف عن تكوين Supabase. جاهز للتكامل (المفاتيح غير معروضة).',
+                configError: 'فشل في تحميل نقطة نهاية التكوين: ',
+                loginSuccess: 'تم تسجيل الدخول بنجاح!',
+                signupSuccess: 'تم التسجيل بنجاح!',
+                guestMode: 'تم تفعيل وضع الضيف',
+                passwordMismatch: 'كلمات المرور غير متطابقة',
+                requiredFields: 'يرجى ملء جميع الحقول',
+                loginError: 'فشل تسجيل الدخول',
+                signupError: 'فشل التسجيل',
+                logout: 'تسجيل الخروج',
+                signupLoginBtnText: 'تسجيل / دخول',
+                settings: 'الإعدادات',
+                appearance: 'المظهر',
+                currency_label: 'العملة',
+                notifications_label: 'إخطارات',
+                tips_label: 'نصائح'
+            },
+            ru: {
+                brand: 'My Money',
+                prototype: 'v1.01',
+                login: 'Вход',
+                signInUp: 'Регистрация / Вход',
+                continueGuest: 'Продолжить как гость',
+                googleLogin: 'Google (Supabase)',
+                language: 'Язык:',
+                tipsOn: 'Советы: Включено',
+                tipsOff: 'Советы: Отключено',
+                notifications: 'Уведомления',
+                welcome: 'Welcome to My Money',
+                intro: 'A clean budgeting prototype. This page is a frontend skeleton served by a local Python server.',
+                loading: 'Загрузка конфигурации…',
+                currency: 'Валюта',
+                noCurrencies: 'Валюты еще не настроены',
+                budget: 'Бюджет',
+                noData: 'Пока нет данных',
+                savingsGoals: 'Цели Сбережений',
+                noGoals: 'Пока нет целей',
+                footer: 'All Winnings Reserved 2025 Built by Ido Credit to the Baskets',
+                configNotSet: 'Ключи Supabase не настроены. Добавьте ключи в локальный файл <code>.env</code>. См. README для инструкций.',
+                configDetected: 'Конфигурация Supabase обнаружена. Готово к интеграции (ключи не показаны).',
+                configError: 'Ошибка загрузки конечной точки config: ',
+                loginSuccess: 'Успешно вошли!',
+                signupSuccess: 'Успешно зарегистрированы!',
+                guestMode: 'Включен режим гостя',
+                passwordMismatch: 'Пароли не совпадают',
+                requiredFields: 'Пожалуйста, заполните все поля',
+                loginError: 'Ошибка входа',
+                signupError: 'Ошибка регистрации',
+                logout: 'Выход',
+                signupLoginBtnText: 'Регистрация / Вход',
+                settings: 'Параметры',
+                appearance: 'Внешний вид',
+                currency_label: 'Валюта',
+                notifications_label: 'Уведомления',
+                tips_label: 'Советы'
+            }
+        };
+
+        let currentLang = 'he';
+        let authState = { user: null, mode: null };
+        let userSettings = {
+            theme: 'dark',
+            background: null,
+            fontFamily: 'Inter, system-ui, Arial',
+            contrastIntensity: 1,
+            glassOpacity: 1,
+            currencies: [],
+            primaryCurrency: 'ILS',
+            enableTips: true,
+            tipsDuration: 25,
+            tipsEnabled: true,
+            tipIntervalSeconds: 33,
+            disabledTips: [],
+            blockSiteTips: false,
+            // Budget
+            totalBudget: 0,
+            budgetPeriod: 'monthly',
+            budgetStartDate: null,
+            budgetDuration: 30,
+            autoAdjust: true,
+            savingsAmount: 0,
+            savingsDesc: '',
+            savingsDeadline: null,
+            reserveAmount: 0,
+            // Notifications
+            enableNotifications: true,
+            notificationFrequency: 'daily',
+            notificationHistory: []
+        };
+
+        function updatePageLanguage(lang) {
+            currentLang = lang;
+            const isRTL = (lang === 'he' || lang === 'ar');
+            document.documentElement.lang = lang;
+            document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+            localStorage.setItem('selectedLanguage', lang);
+
+            const t = translations[lang];
+            document.querySelector('.brand').textContent = t.brand;
+            document.querySelector('.brand').nextElementSibling.textContent = t.prototype;
+            document.querySelector('label[for="loginDrop"]').textContent = t.login;
+            const authBtn = document.getElementById('authBtn');
+            authBtn.textContent = authState.user ? t.logout : t.signupLoginBtnText;
+            document.querySelector('#tipsToggle').textContent = t.tipsOn;
+            document.querySelector('#notifBtn').textContent = t.notifications + ' (0)';
+            document.querySelector('h1').textContent = t.welcome;
+            document.querySelector('p.lead').textContent = t.intro;
+            document.querySelector('#configBanner').textContent = t.loading;
+            // Update budget and goals info texts if present
+            const budgetInfoEl = document.getElementById('budgetInfo'); if (budgetInfoEl) budgetInfoEl.textContent = t.noData;
+            const goalsInfoEl = document.getElementById('goalsInfo'); if (goalsInfoEl) goalsInfoEl.textContent = t.noGoals;
+            document.querySelector('.footer').textContent = t.footer;
+            
+            // Update document title
+            const titleMap = {
+                he: 'הכסף שלי — v1.01',
+                en: 'My Money — v1.01',
+                ar: 'My Money — v1.01',
+                ru: 'My Money — v1.01'
+            };
+            document.title = titleMap[lang] || 'Glass Budget — v1.01';
+            
+            // Update auth modal labels
+            const authTitleMap = {
+                he: 'הרשמה / כניסה',
+                en: 'Sign in / Sign up',
+                ar: 'تسجيل / دخول',
+                ru: 'Регистрация / Вход'
+            };
+            
+            const emailPlaceholderMap = {
+                he: 'דואר אלקטרוני',
+                en: 'Email',
+                ar: 'البريد الإلكتروني',
+                ru: 'Электронная почта'
+            };
+            
+            const passwordPlaceholderMap = {
+                he: 'סיסמה',
+                en: 'Password',
+                ar: 'كلمة المرور',
+                ru: 'Пароль'
+            };
+            
+            const usernameMap = {
+                he: 'שם משתמש',
+                en: 'Username',
+                ar: 'اسم المستخدم',
+                ru: 'Имя пользователя'
+            };
+            
+            const confirmMap = {
+                he: 'אישור סיסמה',
+                en: 'Confirm password',
+                ar: 'تأكيد كلمة المرور',
+                ru: 'Подтвердите пароль'
+            };
+            
+            const loginBtnMap = {
+                he: 'כניסה',
+                en: 'Login',
+                ar: 'تسجيل الدخول',
+                ru: 'Вход'
+            };
+            
+            const signupBtnMap = {
+                he: 'הרשמה',
+                en: 'Sign up',
+                ar: 'إنشاء حساب',
+                ru: 'Зарегистрироваться'
+            };
+            
+            document.getElementById('authTitle').textContent = authTitleMap[lang] || 'Sign in / Sign up';
+            document.getElementById('loginEmail').placeholder = emailPlaceholderMap[lang] || 'Email';
+            document.getElementById('loginPassword').placeholder = passwordPlaceholderMap[lang] || 'Password';
+            document.getElementById('loginBtn').textContent = loginBtnMap[lang] || 'Login';
+            document.getElementById('signupEmail').placeholder = emailPlaceholderMap[lang] || 'Email';
+            document.getElementById('signupUsername').placeholder = usernameMap[lang] || 'Username';
+            document.getElementById('signupPassword').placeholder = passwordPlaceholderMap[lang] || 'Password';
+            document.getElementById('signupConfirm').placeholder = confirmMap[lang] || 'Confirm password';
+            document.getElementById('signupBtn').textContent = signupBtnMap[lang] || 'Sign up';
+        }
+
+        function openAuthModal() {
+            document.getElementById('authModal').classList.add('active');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function switchToLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('signupForm').style.display = 'none';
+        }
+
+        function switchToSignup() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const errorEl = document.getElementById('loginError');
+            const t = translations[currentLang];
+
+            if (!email || !password) {
+                errorEl.textContent = t.requiredFields;
+                return;
+            }
+
+            // Simulate local login (in production, use Supabase)
+            authState.user = { email, username: email.split('@')[0], mode: 'email' };
+            localStorage.setItem('authState', JSON.stringify(authState));
+            errorEl.textContent = '';
+            alert(t.loginSuccess);
+            closeAuthModal();
+            updateAuthButton();
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function handleSignup() {
+            const email = document.getElementById('signupEmail').value.trim();
+            const username = document.getElementById('signupUsername').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+            const confirm = document.getElementById('signupConfirm').value.trim();
+            const errorEl = document.getElementById('signupError');
+            const t = translations[currentLang];
+
+            if (!email || !username || !password || !confirm) {
+                errorEl.textContent = t.requiredFields;
+                return;
+            }
+
+            if (password !== confirm) {
+                errorEl.textContent = t.passwordMismatch;
+                return;
+            }
+
+            // Simulate local signup (in production, use Supabase)
+            authState.user = { email, username, mode: 'email' };
+            localStorage.setItem('authState', JSON.stringify(authState));
+            errorEl.textContent = '';
+            alert(t.signupSuccess);
+            closeAuthModal();
+            updateAuthButton();
+            document.getElementById('signupEmail').value = '';
+            document.getElementById('signupUsername').value = '';
+            document.getElementById('signupPassword').value = '';
+            document.getElementById('signupConfirm').value = '';
+        }
+
+        function handleGuestMode() {
+            const t = translations[currentLang];
+            authState.mode = 'guest';
+            localStorage.setItem('authState', JSON.stringify(authState));
+            alert(t.guestMode);
+            closeAuthModal();
+            updateAuthButton();
+        }
+
+        function handleGoogleLogin() {
+            const googleMessages = {
+                he: 'כניסה עם Google תיושם בעת התחברות ל־Supabase',
+                en: 'Google login will be implemented when connected to Supabase',
+                ar: 'سيتم تنفيذ تسجيل Google عند الاتصال بـ Supabase',
+                ru: 'Вход Google будет реализован при подключении к Supabase'
+            };
+            alert(googleMessages[currentLang] || 'Google login will be implemented when connected to Supabase');
+        }
+
+        function updateAuthButton() {
+            const btn = document.getElementById('authBtn');
+            const t = translations[currentLang];
+            if (authState.user || authState.mode === 'guest') {
+                btn.textContent = t.logout;
+                btn.onclick = handleLogout;
+            } else {
+                btn.textContent = t.signupLoginBtnText;
+                btn.onclick = openAuthModal;
+            }
+        }
+
+        function handleLogout() {
+            authState = { user: null, mode: null };
+            localStorage.removeItem('authState');
+            updateAuthButton();
+            const logoutMessages = {
+                he: 'התנתקת בהצלחה',
+                en: 'Logged out successfully',
+                ar: 'تم تسجيل الخروج بنجاح',
+                ru: 'Успешно вышли из системы'
+            };
+            alert(logoutMessages[currentLang] || 'Logged out successfully');
+        }
+
+        // Settings functions
+        // Fullscreen Budget Panel Functions
+        // ===== BUDGET SETTINGS WORKFLOW FUNCTIONS =====
+        
+        function openBudgetPanel() {
+            const panel = document.getElementById('budget-fullscreen');
+            if (panel) {
+                panel.classList.add('active');
+                loadBudgetData();
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeBudgetPanel() {
+            const panel = document.getElementById('budget-fullscreen');
+            if (panel) {
+                // Add closing animation
+                panel.classList.add('closing');
+                // After animation completes, remove active class and reset
+                setTimeout(() => {
+                    panel.classList.remove('active', 'closing');
+                    document.body.style.overflow = 'auto';
+                }, 300);
+            }
+        }
+
+        function loadBudgetData() {
+            // Load Step 1: Total Budget
+            const budgetInput = document.getElementById('totalBudgetInput');
+            if (budgetInput) budgetInput.value = userSettings.totalBudget || 0;
+            
+            // Load Step 2: Period
+            const periodBtns = document.querySelectorAll('[data-period]');
+            periodBtns.forEach(btn => btn.classList.remove('active'));
+            const activePeriodBtn = document.querySelector(`[data-period="${userSettings.budgetPeriod || 'monthly'}"]`);
+            if (activePeriodBtn) activePeriodBtn.classList.add('active');
+            
+            // Load Step 4: Savings Goals
+            const savingsName = document.getElementById('savingsGoalName');
+            const savingsAmount = document.getElementById('savingsGoalAmount');
+            const savingsDeadline = document.getElementById('savingsGoalDeadline');
+            const savingsNote = document.getElementById('savingsGoalNote');
+            
+            if (savingsName) savingsName.value = userSettings.savingsDesc || '';
+            if (savingsAmount) savingsAmount.value = userSettings.savingsAmount || 0;
+            if (savingsDeadline) savingsDeadline.value = userSettings.savingsDeadline || '';
+            if (savingsNote) savingsNote.value = userSettings.savingsNote || '';
+            
+            // Load Step 5: Smart Features
+            const autoAdjust = document.getElementById('autoAdjust');
+            const enableAlerts = document.getElementById('enableAlerts');
+            const enableGraphs = document.getElementById('enableGraphs');
+            
+            if (autoAdjust) autoAdjust.checked = userSettings.autoAdjust !== false;
+            if (enableAlerts) enableAlerts.checked = userSettings.enableAlerts !== false;
+            if (enableGraphs) enableGraphs.checked = userSettings.enableGraphs !== false;
+            
+            // Load category limits if exists
+            loadCategoryLimits();
+            
+            // Update all calculations
+            updateAllCalculations();
+        }
+
+        function setPeriod(period) {
+            // Update active button
+            const periodBtns = document.querySelectorAll('[data-period]');
+            periodBtns.forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`[data-period="${period}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+            
+            // If custom period, show date inputs
+            const customDateRange = document.getElementById('customDateRange');
+            if (customDateRange) {
+                if (period === 'custom') {
+                    customDateRange.style.display = 'grid';
+                } else {
+                    customDateRange.style.display = 'none';
+                }
+            }
+            
+            userSettings.budgetPeriod = period;
+            updateAllCalculations();
+        }
+
+        function updateAllCalculations() {
+            const totalBudget = parseFloat(document.getElementById('totalBudgetInput')?.value) || 0;
+            const period = userSettings.budgetPeriod || 'monthly';
+            
+            // Calculate days in period
+            let daysInPeriod = 30;
+            let periodLabel = 'חודשי';
+            if (period === 'daily') {
+                daysInPeriod = 1;
+                periodLabel = 'יומי';
+            } else if (period === 'weekly') {
+                daysInPeriod = 7;
+                periodLabel = 'שבועי';
+            } else if (period === 'monthly') {
+                daysInPeriod = 30;
+                periodLabel = 'חודשי';
+            }
+            
+            // Calculate days remaining
+            const today = new Date();
+            let daysRemaining = daysInPeriod;
+            if (period !== 'daily' && period !== 'custom') {
+                const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+                daysRemaining = daysInMonth - today.getDate();
+            }
+            
+            // Calculate daily/weekly allowance
+            const dailyAllowance = totalBudget / daysInPeriod;
+            const weeklyAllowance = dailyAllowance * 7;
+            
+            // Calculate total spent
+            const totalSpent = (userSettings.transactions || [])
+                .filter(tx => tx.type === 'expense')
+                .reduce((sum, tx) => sum + parseFloat(tx.amount || 0), 0);
+            
+            // Calculate remaining balance
+            const remainingBalance = totalBudget - totalSpent;
+            
+            // Update Step 2: Period Stats
+            updatePeriodStats(daysInPeriod, daysRemaining, periodLabel);
+            
+            // Update Step 3: Calculations Grid
+            updateCalculationsDisplay(dailyAllowance, weeklyAllowance, totalSpent, remainingBalance);
+            
+            // Update progress bar
+            const percentage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+            updateProgressBar(percentage);
+            
+            // Update prediction
+            updatePrediction(totalBudget, totalSpent, daysRemaining);
+        }
+
+        function updatePeriodStats(daysInPeriod, daysRemaining, periodLabel) {
+            const totalDaysEl = document.getElementById('totalDaysInPeriod');
+            const remainingDaysEl = document.getElementById('remainingDaysInPeriod');
+            const progressEl = document.getElementById('periodProgress');
+            
+            if (totalDaysEl) totalDaysEl.textContent = daysInPeriod;
+            if (remainingDaysEl) remainingDaysEl.textContent = Math.max(daysRemaining, 0);
+            
+            if (progressEl && daysInPeriod > 0) {
+                const progress = ((daysInPeriod - daysRemaining) / daysInPeriod) * 100;
+                progressEl.textContent = Math.round(progress) + '%';
+            }
+        }
+
+        function updateCalculationsDisplay(dailyAllowance, weeklyAllowance, totalSpent, remainingBalance) {
+            const currencySymbol = '₪';
+            
+            // Daily allowance
+            const dailyEl = document.getElementById('calcDaily');
+            if (dailyEl) dailyEl.textContent = dailyAllowance.toFixed(2) + ' ' + currencySymbol;
+            
+            // Weekly allowance
+            const weeklyEl = document.getElementById('calcWeekly');
+            if (weeklyEl) weeklyEl.textContent = weeklyAllowance.toFixed(2) + ' ' + currencySymbol;
+            
+            // Total spent
+            const spentEl = document.getElementById('calcSpent');
+            if (spentEl) spentEl.textContent = totalSpent.toFixed(2) + ' ' + currencySymbol;
+            
+            // Remaining balance
+            const balanceEl = document.getElementById('calcBalance');
+            if (balanceEl) balanceEl.textContent = remainingBalance.toFixed(2) + ' ' + currencySymbol;
+        }
+
+        function updateProgressBar(percentage) {
+            const progressBar = document.getElementById('budgetProgressBar');
+            if (progressBar) {
+                const fill = progressBar.querySelector('.progress-fill');
+                if (fill) {
+                    fill.style.width = Math.min(percentage, 100) + '%';
+                    fill.classList.remove('warning', 'danger');
+                    if (percentage > 90) {
+                        fill.classList.add('danger');
+                    } else if (percentage > 70) {
+                        fill.classList.add('warning');
+                    }
+                }
+            }
+            
+            // Update progress info
+            const infoEl = document.querySelector('#budgetProgressBar ~ .progress-info');
+            if (infoEl) {
+                infoEl.innerHTML = `<span>${Math.round(percentage)}% הוצאה</span><span>${100 - Math.round(percentage)}% זמין</span>`;
+            }
+        }
+
+        function updatePrediction(totalBudget, totalSpent, daysRemaining) {
+            const predictionBox = document.getElementById('predictionBox');
+            if (!predictionBox) return;
+            
+            if (totalBudget === 0) {
+                predictionBox.innerHTML = '<span class="info-icon">ℹ️</span><span class="info-text">הגדר תקציב כדי לקבל חיזוי</span>';
+                predictionBox.className = 'info-box';
+                return;
+            }
+            
+            const remainingBudget = totalBudget - totalSpent;
+            const avgSpendPerDay = totalSpent > 0 ? totalSpent / 30 : 0;
+            const projectedFinalSpend = avgSpendPerDay * daysRemaining;
+            
+            let message = '';
+            let iconClass = '';
+            
+            if (remainingBudget < 0) {
+                message = `⚠️ חרגת את התקציב ב-${Math.abs(remainingBudget).toFixed(2)}`;
+                iconClass = 'danger';
+            } else if (projectedFinalSpend > totalBudget) {
+                const overage = projectedFinalSpend - totalBudget;
+                message = `⚠️ אם תמשיך בקצב זה, תחרוג ב-${overage.toFixed(2)}`;
+                iconClass = 'warning';
+            } else {
+                const surplus = remainingBudget - projectedFinalSpend;
+                message = `✓ בעקבות נתונים נוכחיים, יישאר לך ${surplus.toFixed(2)}`;
+                iconClass = '';
+            }
+            
+            predictionBox.className = 'info-box' + (iconClass ? ' ' + iconClass : '');
+            predictionBox.innerHTML = `<span class="info-icon">${iconClass ? '⚠️' : '✓'}</span><span class="info-text">${message}</span>`;
+        }
+
+        function toggleCollapsible(element) {
+            const header = element.querySelector('.collapsible-header');
+            const content = element.querySelector('.collapsible-content');
+            const icon = header.querySelector('.collapsible-icon');
+            
+            if (!content) return;
+            
+            content.classList.toggle('active');
+            if (icon) {
+                icon.style.transform = content.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+            }
+        }
+
+        function addCategoryLimitRow() {
+            const container = document.getElementById('categoryLimitsContainer');
+            if (!container) return;
+            
+            const rowId = 'categoryRow_' + Date.now();
+            const categoryOptions = `
+                <option value="מזון">מזון</option>
+                <option value="תחבורה">תחבורה</option>
+                <option value="בידור">בידור</option>
+                <option value="בריאות">בריאות</option>
+                <option value="מלבוש">מלבוש</option>
+                <option value="חשמל">חשמל</option>
+                <option value="אחר">אחר</option>
+            `;
+            
+            const row = document.createElement('div');
+            row.id = rowId;
+            row.style.display = 'grid';
+            row.style.gridTemplateColumns = '1fr 1fr 40px';
+            row.style.gap = '10px';
+            row.style.marginBottom = '10px';
+            
+            row.innerHTML = `
+                <select class="categorySelect" style="padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(126,231,199,0.15);border-radius:8px;color:inherit;">${categoryOptions}</select>
+                <input type="number" class="categoryLimit" placeholder="הגבלה" min="0" style="padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(126,231,199,0.15);border-radius:8px;color:inherit;">
+                <button onclick="removeCategoryRow('${rowId}')" style="padding:10px;background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3);border-radius:8px;color:#FF6B6B;cursor:pointer;font-weight:600;">✕</button>
+            `;
+            
+            container.appendChild(row);
+        }
+
+        function removeCategoryRow(rowId) {
+            const row = document.getElementById(rowId);
+            if (row) row.remove();
+        }
+
+        function loadCategoryLimits() {
+            const container = document.getElementById('categoryLimitsContainer');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (userSettings.categoryLimits && Object.keys(userSettings.categoryLimits).length > 0) {
+                Object.entries(userSettings.categoryLimits).forEach(([category, limit], index) => {
+                    const rowId = 'categoryRow_' + index;
+                    const row = document.createElement('div');
+                    row.id = rowId;
+                    row.style.display = 'grid';
+                    row.style.gridTemplateColumns = '1fr 1fr 40px';
+                    row.style.gap = '10px';
+                    row.style.marginBottom = '10px';
+                    
+                    row.innerHTML = `
+                        <select class="categorySelect" style="padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(126,231,199,0.15);border-radius:8px;color:inherit;">
+                            <option value="${category}" selected>${category}</option>
+                            <option value="מזון">מזון</option>
+                            <option value="תחבורה">תחבורה</option>
+                            <option value="בידור">בידור</option>
+                            <option value="בריאות">בריאות</option>
+                            <option value="מלבוש">מלבוש</option>
+                            <option value="חשמל">חשמל</option>
+                            <option value="אחר">אחר</option>
+                        </select>
+                        <input type="number" class="categoryLimit" value="${limit}" min="0" style="padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(126,231,199,0.15);border-radius:8px;color:inherit;">
+                        <button onclick="removeCategoryRow('${rowId}')" style="padding:10px;background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3);border-radius:8px;color:#FF6B6B;cursor:pointer;font-weight:600;">✕</button>
+                    `;
+                    
+                    container.appendChild(row);
+                });
+            }
+        }
+
+        function finalizeBudgetSettings() {
+            // Save Step 1: Total Budget
+            userSettings.totalBudget = parseFloat(document.getElementById('totalBudgetInput')?.value) || 0;
+            
+            // Save Step 2: Period
+            userSettings.budgetPeriod = userSettings.budgetPeriod || 'monthly';
+            
+            // Save Step 4: Savings Goals
+            userSettings.savingsDesc = document.getElementById('savingsGoalName')?.value || '';
+            userSettings.savingsAmount = parseFloat(document.getElementById('savingsGoalAmount')?.value) || 0;
+            userSettings.savingsDeadline = document.getElementById('savingsGoalDeadline')?.value || '';
+            userSettings.savingsNote = document.getElementById('savingsGoalNote')?.value || '';
+            
+            // Save Step 5: Smart Features
+            userSettings.autoAdjust = document.getElementById('autoAdjust')?.checked || false;
+            userSettings.enableAlerts = document.getElementById('enableAlerts')?.checked || false;
+            userSettings.enableGraphs = document.getElementById('enableGraphs')?.checked || false;
+            
+            // Save category limits
+            userSettings.categoryLimits = {};
+            const categoryRows = document.querySelectorAll('#categoryLimitsContainer > div');
+            categoryRows.forEach(row => {
+                const select = row.querySelector('.categorySelect');
+                const input = row.querySelector('.categoryLimit');
+                if (select && input) {
+                    const category = select.value;
+                    const limit = parseFloat(input.value) || 0;
+                    userSettings.categoryLimits[category] = limit;
+                }
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('userSettings', JSON.stringify(userSettings));
+            
+            // Show success message via tips (before closing so it appears)
+            showTip('הגדרות התקציב נשמרו בהצלחה! ✓');
+            
+            // Close panel with animation
+            closeBudgetPanel();
+        }
+
+        // Add Transaction Modal Functions
+        let currentTransactionType = 'expense';
+
+        function openAddTransactionModal(type = 'expense') {
+            const modal = document.getElementById('add-transaction-modal');
+            if (modal) {
+                currentTransactionType = type;
+                modal.classList.add('active');
+                // Set today's date as default
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('txDate').value = today;
+                
+                // Set transaction type buttons
+                const expenseBtn = document.getElementById('typeExpense');
+                const incomeBtn = document.getElementById('typeIncome');
+                if (expenseBtn && incomeBtn) {
+                    expenseBtn.classList.toggle('active', type === 'expense');
+                    incomeBtn.classList.toggle('active', type === 'income');
+                }
+                
+                // Focus on title input
+                setTimeout(() => {
+                    const titleInput = document.getElementById('txTitle');
+                    if (titleInput) titleInput.focus();
+                }, 100);
+            }
+        }
+
+        function closeAddTransactionModal() {
+            const modal = document.getElementById('add-transaction-modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            // Clear form
+            document.getElementById('txTitle').value = '';
+            document.getElementById('txAmount').value = '';
+            document.getElementById('txNote').value = '';
+            document.getElementById('txDate').value = '';
+            document.getElementById('txCategory').value = 'food';
+        }
+
+        function setTransactionType(type) {
+            currentTransactionType = type;
+            document.getElementById('typeExpense').classList.toggle('active', type === 'expense');
+            document.getElementById('typeIncome').classList.toggle('active', type === 'income');
+        }
+
+        function saveTransaction() {
+            const title = document.getElementById('txTitle').value.trim();
+            const category = document.getElementById('txCategory').value;
+            const amount = parseFloat(document.getElementById('txAmount').value);
+            const date = document.getElementById('txDate').value;
+            const note = document.getElementById('txNote').value.trim();
+            
+            if (!title || !amount || !date) {
+                alert('יש למלא את כל השדות הנדרשים: כותרת, סכום, ותאריך');
+                return;
+            }
+            
+            if (amount <= 0) {
+                alert('הסכום חייב להיות גדול מאפס');
+                return;
+            }
+            
+            if (!userSettings.transactions) {
+                userSettings.transactions = [];
+            }
+            
+            const transaction = {
+                id: Date.now(),
+                type: currentTransactionType,
+                title,
+                category,
+                amount,
+                date,
+                note,
+                currency: 'ILS',
+                createdAt: new Date().toISOString()
+            };
+            
+            userSettings.transactions.unshift(transaction);
+            localStorage.setItem('userSettings', JSON.stringify(userSettings));
+            
+            closeAddTransactionModal();
+            updateBudgetDisplay();
+            updateExpenseIncomeDisplay();
+            renderTransactionList();
+            
+            // Show success message
+            const typeLabel = currentTransactionType === 'expense' ? 'הוצאה' : 'הכנסה';
+            showTip(`${typeLabel} נוספה בהצלחה! ✓ ${title}`);
+        }
+
+        function openPopup(popupId) {
+            // Close any open popups first
+            document.querySelectorAll('.settings-popup').forEach(p => p.classList.remove('active'));
+            // Mark icon as active
+            document.querySelectorAll('.icon-btn').forEach(btn => btn.classList.remove('active'));
+            const iconMap = {
+                'budget-popup': 'icon-budget',
+                'design-popup': 'icon-design',
+                'language-popup': 'icon-language',
+                'notifications-popup': 'icon-notifications',
+                'tips-popup': 'icon-tips',
+                'account-popup': 'icon-account'
+            };
+            if (iconMap[popupId]) {
+                const iconBtn = document.getElementById(iconMap[popupId]);
+                if (iconBtn) {
+                    iconBtn.classList.add('active');
+                }
+            }
+            // Update account popup before opening if it's the account popup
+            if (popupId === 'account-popup') {
+                updateAccountPopup();
+            }
+            const popup = document.getElementById(popupId);
+            if (popup) {
+                popup.classList.add('active');
+            }
+        }
+
+        function updateAccountPopup() {
+            const accountStatus = document.getElementById('accountStatus');
+            if (accountStatus) {
+                if (authState.user) {
+                    accountStatus.textContent = (currentLang === 'he') ? 'מחובר: ' + authState.user : 'Logged in: ' + authState.user;
+                } else if (authState.mode === 'guest') {
+                    accountStatus.textContent = (currentLang === 'he') ? 'אורח' : 'Guest';
+                } else {
+                    accountStatus.textContent = (currentLang === 'he') ? 'לא מחובר' : 'Not logged in';
+                }
+            }
+        }
+
+        function closePopup(popupId) {
+            const popup = document.getElementById(popupId);
+            if (popup) popup.classList.remove('active');
+            document.querySelectorAll('.icon-btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function closeAllPopups() {
+            document.querySelectorAll('.settings-popup').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.icon-btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function logOutUser() {
+            authState = { user: null, mode: 'guest' };
+            localStorage.removeItem('authState');
+            updateAuthButton();
+            updateAccountPopup();
+            closePopup('account-popup');
+        }
+
+        function openSettingsModal() {
+            document.getElementById('settingsModal').classList.add('active');
+            loadUserSettings();
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        function saveSettings() {
+            localStorage.setItem('userSettings', JSON.stringify(userSettings));
+        }
+
+        function changeTheme(theme) {
+            userSettings.theme = theme;
+            saveSettings();
+            applyTheme(theme);
+        }
+
+        function applyTheme(theme) {
+            const root = document.documentElement;
+            const page = document.querySelector('.page');
+            const body = document.body;
+            
+            page.style.background = '';
+            page.style.backgroundAttachment = '';
+            body.style.background = '';
+            body.style.color = '';
+            
+            if (theme === 'light') {
+                // Light mode colors
+                root.style.setProperty('--glass-bg', 'rgba(255,255,255,0.8)');
+                root.style.setProperty('--glass-border', 'rgba(200,200,200,0.4)');
+                root.style.setProperty('--accent', '#2d9d78');
+                root.style.setProperty('--muted', '#5a5a5a');
+                
+                page.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%)';
+                body.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%)';
+                body.style.color = '#1a1a1a';
+                document.documentElement.style.colorScheme = 'light';
+                
+                // Update text colors for light mode
+                document.documentElement.style.setProperty('--text-color', '#1a1a1a');
+                document.documentElement.style.setProperty('--secondary-text', '#5a5a5a');
+            } else if (theme === 'dark') {
+                // Dark mode colors
+                root.style.setProperty('--glass-bg', 'rgba(255,255,255,0.06)');
+                root.style.setProperty('--glass-border', 'rgba(255,255,255,0.12)');
+                root.style.setProperty('--accent', '#7EE7C7');
+                root.style.setProperty('--muted', '#9AA4B2');
+                
+                page.style.background = 'linear-gradient(135deg, #0a1420 0%, #0f1a2a 50%, #081426 100%)';
+                body.style.background = 'linear-gradient(135deg, #0a1420 0%, #0f1a2a 50%, #081426 100%)';
+                body.style.color = '#e9eef6';
+                document.documentElement.style.colorScheme = 'dark';
+                
+                // Update text colors for dark mode
+                document.documentElement.style.setProperty('--text-color', '#e9eef6');
+                document.documentElement.style.setProperty('--secondary-text', '#9AA4B2');
+            } else if (theme === 'transparent') {
+                // Transparent mode
+                root.style.setProperty('--glass-bg', 'rgba(255,255,255,0.06)');
+                root.style.setProperty('--glass-border', 'rgba(255,255,255,0.12)');
+                root.style.setProperty('--accent', '#7EE7C7');
+                root.style.setProperty('--muted', '#9AA4B2');
+                
+                page.style.background = 'rgba(15, 23, 42, 0.5)';
+                page.style.backgroundAttachment = 'fixed';
+                body.style.background = 'rgba(15, 23, 42, 0.5)';
+                body.style.color = '#e9eef6';
+            }
+            
+            if (userSettings.background) {
+                if (userSettings.background.startsWith('http')) {
+                    page.style.backgroundImage = `url('${userSettings.background}')`;
+                    page.style.backgroundSize = 'cover';
+                    page.style.backgroundPosition = 'center';
+                }
+            }
+            
+            // Apply opacity to CSS variables
+            document.documentElement.style.setProperty('--opacity', userSettings.glassOpacity || 1);
+            
+            // Force re-render of all glass elements
+            document.querySelectorAll('.glass, .card, .modal-content').forEach(el => {
+                el.style.background = '';
+                el.style.border = '';
+            });
+        }
+
+        function handleBgUpload() {
+            const file = document.getElementById('bgUpload').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    userSettings.background = e.target.result;
+                    saveSettings();
+                    applyTheme(userSettings.theme);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleBgUrl() {
+            const url = document.getElementById('bgUrl').value.trim();
+            if (url) {
+                userSettings.background = url;
+                saveSettings();
+                applyTheme(userSettings.theme);
+            }
+        }
+
+        function resetBackground() {
+            userSettings.background = null;
+            document.getElementById('bgUpload').value = '';
+            document.getElementById('bgUrl').value = '';
+            saveSettings();
+            applyTheme(userSettings.theme);
+        }
+
+        function loadUserSettings() {
+            const saved = localStorage.getItem('userSettings');
+            if (saved) {
+                try {
+                    userSettings = JSON.parse(saved);
+                } catch (e) {
+                    console.log('Failed to load settings');
+                }
+            }
+            // Update UI based on settings (defensive checks for elements)
+            try {
+                const themeEl = document.querySelector(`input[name="theme"][value="${userSettings.theme}"]`);
+                if (themeEl) themeEl.checked = true;
+            } catch (e) {}
+            const el_enableTips2 = document.getElementById('enableTips2'); if (el_enableTips2) el_enableTips2.checked = !!userSettings.tipsEnabled;
+            const el_enableNotif = document.getElementById('enableNotif'); if (el_enableNotif) el_enableNotif.checked = !!userSettings.enableNotifications;
+            const el_tipsDuration2 = document.getElementById('tipsDuration2'); if (el_tipsDuration2) el_tipsDuration2.value = userSettings.tipsDuration;
+            const el_durationValue2 = document.getElementById('durationValue2'); if (el_durationValue2) el_durationValue2.textContent = (userSettings.tipsDuration || 25) + ' שנ';
+            const el_glassOpacity = document.getElementById('glassOpacity'); if (el_glassOpacity) el_glassOpacity.value = userSettings.glassOpacity || 1;
+            const el_opacityValue = document.getElementById('opacityValue'); if (el_opacityValue) el_opacityValue.textContent = Math.round((userSettings.glassOpacity || 1) * 100) + '%';
+            document.documentElement.style.setProperty('--opacity', userSettings.glassOpacity || 1);
+            // primary currency selector removed
+            const el_totalBudget = document.getElementById('totalBudget'); if (el_totalBudget) el_totalBudget.value = userSettings.totalBudget;
+            const el_budgetPeriod = document.getElementById('budgetPeriod'); if (el_budgetPeriod) el_budgetPeriod.value = userSettings.budgetPeriod;
+            const el_budgetStartDate = document.getElementById('budgetStartDate'); if (el_budgetStartDate) el_budgetStartDate.value = userSettings.budgetStartDate || '';
+            const el_budgetDuration = document.getElementById('budgetDuration'); if (el_budgetDuration) el_budgetDuration.value = userSettings.budgetDuration;
+            const el_autoAdjust = document.getElementById('autoAdjust'); if (el_autoAdjust) el_autoAdjust.checked = !!userSettings.autoAdjust;
+            const el_savingsAmount = document.getElementById('savingsAmount'); if (el_savingsAmount) el_savingsAmount.value = userSettings.savingsAmount;
+            const el_savingsDesc = document.getElementById('savingsDesc'); if (el_savingsDesc) el_savingsDesc.value = userSettings.savingsDesc;
+            const el_savingsDeadline = document.getElementById('savingsDeadline'); if (el_savingsDeadline) el_savingsDeadline.value = userSettings.savingsDeadline || '';
+            const el_reserveAmount = document.getElementById('reserveAmount'); if (el_reserveAmount) el_reserveAmount.value = userSettings.reserveAmount;
+            try { const nf = document.querySelector(`input[name="notifFreq"][value="${userSettings.notificationFrequency}"]`); if (nf) nf.checked = true; } catch (e) {}
+            // ensure expected arrays/shape exist
+            userSettings.transactions = Array.isArray(userSettings.transactions) ? userSettings.transactions : [];
+            userSettings.notificationHistory = Array.isArray(userSettings.notificationHistory) ? userSettings.notificationHistory : [];
+            userSettings.disabledTips = Array.isArray(userSettings.disabledTips) ? userSettings.disabledTips : [];
+            userSettings.currencies = Array.isArray(userSettings.currencies) ? userSettings.currencies : [];
+            // tips specific
+            const el_tipsFrequency = document.getElementById('tipsFrequency'); if (el_tipsFrequency) el_tipsFrequency.value = userSettings.tipIntervalSeconds || 33;
+            const el_blockSiteTips = document.getElementById('blockSiteTips'); if (el_blockSiteTips) el_blockSiteTips.checked = !!userSettings.blockSiteTips;
+            // update top-right label and start/stop tips based on setting
+            updateTipsToggleLabel();
+            if (userSettings.tipsEnabled) startTipsLoop(); else stopTipsLoop();
+            // currency list removed
+            renderNotificationHistory();
+            renderTipList();
+            // update budget display and transaction list
+            renderTransactionList();
+            updateBudgetDisplay();
+            updateExpenseIncomeDisplay();
+        }
+
+        function changeLanguageSetting() {
+            const lang = document.getElementById('settingsLang').value;
+            updatePageLanguage(lang);
+            document.getElementById('langSel').value = lang;
+        }
+
+        // Currency management removed: app uses a single default currency symbol (₪)
+
+        function saveBudgetSettings() {
+            userSettings.totalBudget = parseFloat(document.getElementById('totalBudget').value) || 0;
+            userSettings.budgetPeriod = document.getElementById('budgetPeriod').value;
+            userSettings.budgetStartDate = document.getElementById('budgetStartDate').value;
+            userSettings.budgetDuration = parseInt(document.getElementById('budgetDuration').value) || 30;
+            userSettings.autoAdjust = document.getElementById('autoAdjust').checked;
+            userSettings.savingsAmount = parseFloat(document.getElementById('savingsAmount').value) || 0;
+            userSettings.savingsDesc = document.getElementById('savingsDesc').value;
+            userSettings.savingsDeadline = document.getElementById('savingsDeadline').value;
+            userSettings.reserveAmount = parseFloat(document.getElementById('reserveAmount').value) || 0;
+            saveSettings();
+            // Update budget calculations / dashboard
+            updateBudgetDisplay();
+        }
+
+        function toggleNotifications() {
+            userSettings.enableNotifications = document.getElementById('enableNotif').checked;
+            saveSettings();
+        }
+
+        function saveNotifSettings() {
+            userSettings.notificationFrequency = document.querySelector('input[name="notifFreq"]:checked').value;
+            saveSettings();
+        }
+
+        function sendTestNotification() {
+            const now = new Date().toLocaleString();
+            const msg = { time: now, text: 'זו הודעת בדיקה מ־הכסף שלי' };
+            userSettings.notificationHistory.unshift(msg);
+            if (userSettings.notificationHistory.length > 10) {
+                userSettings.notificationHistory.pop();
+            }
+            saveSettings();
+            renderNotificationHistory();
+            alert('הודעת בדיקה נשלחה!');
+        }
+
+        function renderNotificationHistory() {
+            const hist = document.getElementById('notifHistory');
+            if (userSettings.notificationHistory.length === 0) {
+                hist.innerHTML = '<p style="color:#aaa">אין הודעות עדיין</p>';
+            } else {
+                hist.innerHTML = userSettings.notificationHistory.map(n => `
+                    <div style="padding:6px;border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0">
+                        <div style="color:#aaa;font-size:0.75rem">${n.time}</div>
+                        <div>${n.text}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // --- Budget engine: transactions, summaries and dashboard rendering ---
+        // Transactions stored in userSettings.transactions as {amount, currency, date, desc}
+        if (!Array.isArray(userSettings.transactions)) userSettings.transactions = [];
+
+        function addTransaction(tx) {
+            if (!tx || isNaN(parseFloat(tx.amount))) return false;
+            if (!Array.isArray(userSettings.transactions)) {
+                // defensive init in case loadUserSettings replaced settings without transactions
+                userSettings.transactions = [];
+            }
+            // normalize
+            const type = tx.type === 'income' ? 'income' : 'expense';
+            const category = tx.category || '';
+            userSettings.transactions.unshift({
+                amount: parseFloat(tx.amount),
+                currency: tx.currency || 'ILS',
+                date: tx.date || new Date().toISOString().slice(0,10),
+                desc: tx.desc || '',
+                type,
+                category
+            });
+            // keep recent 500
+            if (userSettings.transactions.length > 500) userSettings.transactions.length = 500;
+            saveSettings();
+            updateBudgetDisplay();
+            renderTransactionList();
+            return true;
+        }
+
+        function _elValue(id, fallback = '') {
+            const el = document.getElementById(id);
+            return el ? el.value : fallback;
+        }
+
+        function addTransactionFromUI(){
+            try {
+                const raw = _elValue('txAmount', '').toString().trim();
+                // accept comma as decimal separator
+                const normalized = raw.replace(',', '.');
+                const amt = parseFloat(normalized);
+                if (isNaN(amt)) {
+                    const t = translations[currentLang] || translations['en'];
+                    alert(currentLang === 'he' ? 'נא להזין סכום חוקי' : (currentLang === 'es' ? 'Por favor ingrese una cantidad válida' : 'Please enter a valid amount'));
+                    return;
+                }
+                const tx = {
+                    amount: Math.abs(amt),
+                    type: _elValue('txType', 'expense') || 'expense',
+                    currency: _elValue('txCurrency', 'ILS'),
+                    date: _elValue('txDate', new Date().toISOString().slice(0,10)),
+                    category: _elValue('txCategory', ''),
+                    desc: _elValue('txDesc', '')
+                };
+                const ok = addTransaction(tx);
+                if (!ok) throw new Error('Failed to add transaction');
+                // clear inputs if present
+                const amtEl = document.getElementById('txAmount'); if (amtEl) amtEl.value = '';
+                const descEl = document.getElementById('txDesc'); if (descEl) descEl.value = '';
+                const dateEl = document.getElementById('txDate'); if (dateEl) dateEl.value = '';
+                const catEl = document.getElementById('txCategory'); if (catEl) catEl.value = '';
+            } catch (err) {
+                console.error('addTransactionFromUI error', err);
+                const msg = (err && err.message) ? err.message : 'unknown';
+                const t = translations[currentLang] || translations['en'];
+                alert((currentLang === 'he') ? ('שגיאה בהוספת עסקה — ' + msg) : ((currentLang === 'es') ? ('Error al agregar la transacción — ' + msg) : ('Error adding transaction — ' + msg)));
+            }
+        }
+
+        function removeTransactionAt(idx){
+            if (idx < 0 || idx >= userSettings.transactions.length) return;
+            userSettings.transactions.splice(idx,1);
+            saveSettings();
+            renderTransactionList();
+            updateBudgetDisplay();
+            updateExpenseIncomeDisplay();
+        }
+
+        function renderTransactionList(){
+            const el = document.getElementById('txList');
+            const countBadge = document.getElementById('transactionCountBadge');
+            
+            if (!el) return;
+            
+            const transactions = userSettings.transactions || [];
+            if (countBadge) {
+                countBadge.textContent = `(${transactions.length})`;
+            }
+            
+            if (transactions.length === 0) {
+                el.innerHTML = '<p style="color:var(--muted);text-align:center;padding:20px">אין עסקאות עדיין</p>';
+                return;
+            }
+            
+            // Show last 10 transactions
+            const recentTxs = transactions.slice(0, 10);
+            const currencySymbol = '₪';
+            el.innerHTML = recentTxs.map((t, i) => {
+                const isIncome = (t.type === 'income');
+                const color = isIncome ? 'rgba(72,187,120,0.1)' : 'rgba(255,99,99,0.1)';
+                const borderColor = isIncome ? 'rgba(72,187,120,0.2)' : 'rgba(255,99,99,0.2)';
+                const textColor = isIncome ? '#48BB78' : '#FF6B6B';
+                const sign = isIncome ? '+' : '−';
+                const categoryTag = t.category ? `<span style="font-size:0.8rem;color:var(--muted);margin-left:8px">[${t.category}]</span>` : '';
+                
+                return `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;border:1px solid ${borderColor};background:${color};margin-bottom:8px;transition:all .2s">
+                    <div style="flex:1">
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <span style="font-weight:700;color:${textColor};font-size:1rem">${sign}${t.amount.toFixed(2)}</span>
+                            <span style="color:var(--muted);font-size:0.9rem">${currencySymbol}</span>
+                            ${categoryTag}
+                        </div>
+                        <div style="color:var(--muted);font-size:0.85rem;margin-top:4px">${t.title || 'ללא כותרת'} • ${t.date}</div>
+                        ${t.note ? `<div style="color:var(--muted);font-size:0.8rem;margin-top:3px;font-style:italic">${t.note}</div>` : ''}
+                    </div>
+                    <button class="btn" onclick="removeTransactionAt(${transactions.indexOf(t)})" style="padding:6px 10px;font-size:0.85rem;background:rgba(255,107,107,0.15);border-color:rgba(255,107,107,0.3);color:#FF6B6B;margin-right:8px">הסר</button>
+                </div>
+            `; }).join('');
+        }
+
+        function computeBudgetSummary(){
+            const totalBudget = parseFloat(userSettings.totalBudget) || 0;
+            const start = userSettings.budgetStartDate ? new Date(userSettings.budgetStartDate) : new Date();
+            const duration = parseInt(userSettings.budgetDuration) || 30;
+            const end = new Date(start.getTime()); end.setDate(start.getDate() + duration - 1);
+            const today = new Date();
+            // calculate spent and income within period
+            let expenses = 0;
+            let income = 0;
+            (userSettings.transactions || []).forEach(t => {
+                try {
+                    const d = new Date(t.date);
+                    if (d >= start && d <= end) {
+                        if (t.type === 'income') income += parseFloat(t.amount) || 0;
+                        else expenses += parseFloat(t.amount) || 0;
+                    }
+                } catch (e) {}
+            });
+            const reserve = parseFloat(userSettings.reserveAmount) || 0;
+            // remaining budget (for spending) - incomes do not directly reduce budget but are shown separately
+            const remaining = Math.max(0, totalBudget - expenses - reserve);
+            // overall net during period
+            const net = income - expenses;
+            // remaining days (including today)
+            const msPerDay = 24*60*60*1000;
+            const remDays = Math.max(1, Math.ceil((end - today + 1*msPerDay) / msPerDay));
+            const dailyAllowance = remaining / remDays;
+            return { totalBudget, expenses, income, net, remaining, reserve, start, end, remDays, dailyAllowance };
+        }
+
+        function updateBudgetDisplay(){
+            const summary = computeBudgetSummary();
+            const budgetInfo = document.getElementById('budgetInfo');
+            const currencySymbol = '₪';
+            if (budgetInfo) {
+                budgetInfo.innerHTML = `
+                    <div style="font-size:0.95rem">סה"כ תקציב: <strong>${summary.totalBudget.toFixed(2)} ${currencySymbol}</strong></div>
+                    <div style="font-size:0.95rem;color:rgba(255,99,99,0.9)">סה"כ הוצאות: <strong>${summary.expenses.toFixed(2)} ${currencySymbol}</strong></div>
+                    <div style="font-size:0.95rem;color:rgba(72,187,120,0.95)">סה"כ הכנסות: <strong>${summary.income.toFixed(2)} ${currencySymbol}</strong></div>
+                    <div style="font-size:0.95rem">יתרת תקופה (הכנסות - הוצאות): <strong>${summary.net.toFixed(2)} ${currencySymbol}</strong></div>
+                    <div style="font-size:0.95rem">שמורה בסוף: <strong>${summary.reserve.toFixed(2)} ${currencySymbol}</strong></div>
+                    <div style="font-size:0.95rem">נשאר לתקציב: <strong>${summary.remaining.toFixed(2)} ${currencySymbol}</strong></div>
+                    <div style="font-size:0.95rem">ימים נותרו: <strong>${summary.remDays}</strong></div>
+                    <div style="font-size:0.95rem">אשראי יומי מומלץ: <strong>${summary.dailyAllowance.toFixed(2)} ${currencySymbol}</strong></div>
+                `;
+            }
+            const goalsInfo = document.getElementById('goalsInfo');
+            if (goalsInfo) {
+                goalsInfo.innerHTML = `יעד חיסכון: <strong>${(userSettings.savingsAmount || 0).toFixed(2)} ${currencySymbol}</strong> — ${userSettings.savingsDesc || '-'} ${userSettings.savingsDeadline ? 'עד ' + userSettings.savingsDeadline : ''}`;
+            }
+            
+            // Update expense/income totals on home screen
+            updateExpenseIncomeDisplay();
+        }
+
+        function updateExpenseIncomeDisplay() {
+            const currencySymbol = '₪';
+            
+            let totalExpenses = 0;
+            let totalIncome = 0;
+            
+            (userSettings.transactions || []).forEach(t => {
+                if (t.type === 'expense') {
+                    totalExpenses += parseFloat(t.amount) || 0;
+                } else if (t.type === 'income') {
+                    totalIncome += parseFloat(t.amount) || 0;
+                }
+            });
+            
+            const netBalance = totalIncome - totalExpenses;
+            
+            // Update displays
+            const expenseDisplay = document.getElementById('totalExpensesDisplay');
+            const incomeDisplay = document.getElementById('totalIncomeDisplay');
+            const netDisplay = document.getElementById('netBalanceDisplay');
+            
+            if (expenseDisplay) expenseDisplay.textContent = totalExpenses.toFixed(2) + ' ' + currencySymbol;
+            if (incomeDisplay) incomeDisplay.textContent = totalIncome.toFixed(2) + ' ' + currencySymbol;
+            
+            if (netDisplay) {
+                netDisplay.textContent = netBalance.toFixed(2) + ' ' + currencySymbol;
+                // Change color based on positive/negative
+                if (netBalance < 0) {
+                    netDisplay.style.color = '#FF6B6B';
+                } else if (netBalance > 0) {
+                    netDisplay.style.color = '#48BB78';
+                } else {
+                    netDisplay.style.color = 'var(--accent)';
+                }
+            }
+        }
+
+        function toggleTipsGeneral() {
+            userSettings.tipsEnabled = document.getElementById('enableTips2').checked;
+            setTipsEnabled(userSettings.tipsEnabled);
+        }
+
+        function setTipsEnabled(enabled) {
+            userSettings.tipsEnabled = !!enabled;
+            userSettings.enableTips = !!enabled;
+            saveSettings();
+            updateTipsToggleLabel();
+            if (userSettings.tipsEnabled) startTipsLoop();
+            else stopTipsLoop();
+            // sync checkboxes in settings
+            const e1 = document.getElementById('enableTips');
+            const e2 = document.getElementById('enableTips2');
+            if (e1) e1.checked = userSettings.tipsEnabled;
+            if (e2) e2.checked = userSettings.tipsEnabled;
+        }
+
+        function updateTipsToggleLabel() {
+            const t = translations[currentLang] || translations['en'];
+            const toggle = document.getElementById('tipsToggle');
+            if (!toggle) return;
+            toggle.textContent = userSettings.tipsEnabled ? t.tipsOn : t.tipsOff;
+        }
+
+        function updateTipsDuration2() {
+            const val = parseInt(document.getElementById('tipsDuration2').value);
+            userSettings.tipsDuration = val;
+            document.getElementById('durationValue2').textContent = val + ' שניות';
+            saveSettings();
+        }
+
+        function resetTips() {
+            if (confirm('האם אתה בטוח שברצונך לאפס את כל הטיפים?')) {
+                // Reset tips state
+                userSettings.disabledTips = [];
+                userSettings.blockSiteTips = false;
+                saveSettings();
+                renderTipList();
+                restartTips();
+                alert('טיפים הופעלו מחדש');
+            }
+        }
+
+        function setTipFrequency() {
+            const val = parseInt(document.getElementById('tipsFrequency').value) || 33;
+            userSettings.tipIntervalSeconds = val;
+            saveSettings();
+            restartTips();
+        }
+
+        function toggleBlockSiteTips() {
+            const checked = document.getElementById('blockSiteTips').checked;
+            userSettings.blockSiteTips = !!checked;
+            saveSettings();
+            restartTips();
+        }
+
+        function renderTipList() {
+            const list = document.getElementById('tipListSettings');
+            const tipsByLang = getTipsForCurrentLang();
+            const flat = [];
+            ['budget','savings','management','general'].forEach(cat => {
+                (tipsByLang[cat] || []).forEach(t => flat.push(t));
+            });
+            if (flat.length === 0) {
+                list.innerHTML = '<p style="color:#aaa">אין טיפים להצגה</p>';
+                return;
+            }
+            list.innerHTML = flat.map(t => {
+                const disabled = userSettings.disabledTips.includes(t.id);
+                const authorTag = t.author === 'site' ? ' (צוות)' : '';
+                return `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px;border-bottom:1px solid rgba(255,255,255,0.03)">
+                        <div style="font-size:0.92rem">${t.text}${authorTag}</div>
+                        <div>
+                            <button onclick="toggleTipDisabled('${t.id}')" style="padding:6px 10px">${disabled ? 'הפעל' : 'השבת'}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleTipDisabled(id) {
+            const idx = userSettings.disabledTips.indexOf(id);
+            if (idx === -1) userSettings.disabledTips.push(id);
+            else userSettings.disabledTips.splice(idx,1);
+            saveSettings();
+            renderTipList();
+            restartTips();
+        }
+
+        // --- Tips runtime: show rotating tips according to user settings ---
+        let tipsTimer = null;
+        let tipHideTimer = null;
+
+        const tipsTemplates = {
+            he: {
+                budget: [
+                    { id: 'he-b1', author: 'site', text: 'קבע סכום יומי קטן — זה עוזר לשמור על עקביות.' },
+                    { id: 'he-b2', author: 'user', text: 'בדוק הוצאות קטנות — הן מצטברות במהירות.' }
+                ],
+                savings: [
+                    { id: 'he-s1', author: 'site', text: 'הגדר יעד חיסכון חודשי קטן ויציב.' },
+                    { id: 'he-s2', author: 'user', text: 'חסוך באופן אוטומטי כל חודש כדי להקדים מטרות.' }
+                ],
+                management: [
+                    { id: 'he-m1', author: 'user', text: 'עקוב אחרי קטגוריות הוצאה שיעזרו לך לתעדף.' },
+                    { id: 'he-m2', author: 'user', text: 'קבע חוקים פשוטים לחיסכון כמו "0.5% מהמשכורת".' }
+                ],
+                general: [
+                    { id: 'he-g1', author: 'site', text: 'מומלץ להירשם כדי לסנכרן בין מכשירים.' },
+                    { id: 'he-g2', author: 'user', text: 'נסה להפעיל התראות לתזכורת יומית.' }
+                ]
+            },
+            en: {
+                budget: [
+                    { id: 'en-b1', author: 'site', text: 'Set a small daily amount — consistency matters.' },
+                    { id: 'en-b2', author: 'user', text: 'Check small expenses — they add up fast.' }
+                ],
+                savings: [
+                    { id: 'en-s1', author: 'site', text: 'Set a modest monthly savings goal and automate it.' },
+                    { id: 'en-s2', author: 'user', text: 'Automate transfers to build savings without thinking.' }
+                ],
+                management: [
+                    { id: 'en-m1', author: 'user', text: 'Track spending categories to prioritize better.' },
+                    { id: 'en-m2', author: 'user', text: 'Create simple saving rules like "5% of income".' }
+                ],
+                general: [
+                    { id: 'en-g1', author: 'site', text: 'Sign in to sync across devices (recommended).' },
+                    { id: 'en-g2', author: 'user', text: 'Enable notifications for daily reminders.' }
+                ]
+            },
+            es: {
+                budget: [
+                    { id: 'es-b1', author: 'site', text: 'Establece una cantidad diaria pequeña — la consistencia importa.' },
+                    { id: 'es-b2', author: 'user', text: 'Revisa gastos pequeños — se acumulan rápido.' }
+                ],
+                savings: [
+                    { id: 'es-s1', author: 'site', text: 'Fija un objetivo de ahorro mensual y automatízalo.' },
+                    { id: 'es-s2', author: 'user', text: 'Transfiere automáticamente para ahorrar sin pensar.' }
+                ],
+                management: [
+                    { id: 'es-m1', author: 'user', text: 'Sigue categorías de gasto para priorizar mejor.' },
+                    { id: 'es-m2', author: 'user', text: 'Crea reglas simples de ahorro, por ejemplo "5% del ingreso".' }
+                ],
+                general: [
+                    { id: 'es-g1', author: 'site', text: 'Inicia sesión para sincronizar entre dispositivos (recomendado).' },
+                    { id: 'es-g2', author: 'user', text: 'Activa notificaciones para recordatorios diarios.' }
+                ]
+            }
+            ,
+            ar: {
+                budget: [
+                    { id: 'ar-b1', author: 'site', text: 'حدد مبلغًا يوميًا صغيرًا — الاتساق مهم.' },
+                    { id: 'ar-b2', author: 'user', text: 'تحقق من النفقات الصغيرة — تتراكم بسرعة.' }
+                ],
+                savings: [
+                    { id: 'ar-s1', author: 'site', text: 'حدد هدف ادخار شهري متواضع وقم بأتمتته.' },
+                    { id: 'ar-s2', author: 'user', text: 'قم بأتمتة التحويلات لتنمية المدخرات دون تفكير.' }
+                ],
+                management: [
+                    { id: 'ar-m1', author: 'user', text: 'تتبع فئات الإنفاق لتحديد الأولويات بشكل أفضل.' },
+                    { id: 'ar-m2', author: 'user', text: 'أنشئ قواعد ادخار بسيطة مثل "5% من الدخل".' }
+                ],
+                general: [
+                    { id: 'ar-g1', author: 'site', text: 'قم بتسجيل الدخول للمزامنة بين الأجهزة (موصى به).' },
+                    { id: 'ar-g2', author: 'user', text: 'قم بتمكين الإشعارات للتذكيرات اليومية.' }
+                ]
+            },
+            ru: {
+                budget: [
+                    { id: 'ru-b1', author: 'site', text: 'Установите небольшую ежедневную сумму — постоянство важно.' },
+                    { id: 'ru-b2', author: 'user', text: 'Проверяйте мелкие расходы — они быстро накапливаются.' }
+                ],
+                savings: [
+                    { id: 'ru-s1', author: 'site', text: 'Установите скромную месячную цель сбережений и автоматизируйте её.' },
+                    { id: 'ru-s2', author: 'user', text: 'Автоматизируйте переводы, чтобы копить без лишних действий.' }
+                ],
+                management: [
+                    { id: 'ru-m1', author: 'user', text: 'Отслеживайте категории расходов, чтобы лучше приоритизировать.' },
+                    { id: 'ru-m2', author: 'user', text: 'Создайте простые правила сбережений, например "5% от дохода".' }
+                ],
+                general: [
+                    { id: 'ru-g1', author: 'site', text: 'Войдите, чтобы синхронизировать данные между устройствами (рекомендуется).' },
+                    { id: 'ru-g2', author: 'user', text: 'Включите уведомления для ежедневных напоминаний.' }
+                ]
+            }
+        };
+
+        function getTipsForCurrentLang() {
+            return tipsTemplates[currentLang] || tipsTemplates['en'];
+        }
+
+        function isTipCategoryEnabled(catId) {
+            // accept both new ids and default to true
+            try {
+                const el = document.getElementById(catId);
+                return el ? el.checked : true;
+            } catch (e) { return true; }
+        }
+
+        function pickNextTip() {
+            const tipsByLang = getTipsForCurrentLang();
+            const pool = [];
+            if (isTipCategoryEnabled('tip_cat_budget')) pool.push(...(tipsByLang.budget || []));
+            if (isTipCategoryEnabled('tip_cat_savings')) pool.push(...(tipsByLang.savings || []));
+            if (isTipCategoryEnabled('tip_cat_management')) pool.push(...(tipsByLang.management || []));
+            if (isTipCategoryEnabled('tip_cat_general')) pool.push(...(tipsByLang.general || []));
+
+            // filter out disabled tips and optionally block site tips
+            const filtered = pool.filter(t => {
+                if (!t || !t.id) return false;
+                if (userSettings.disabledTips && userSettings.disabledTips.includes(t.id)) return false;
+                if (userSettings.blockSiteTips && t.author === 'site') return false;
+                return true;
+            });
+
+            if (filtered.length === 0) return null;
+            // pick random object and return its text
+            const pick = filtered[Math.floor(Math.random() * filtered.length)];
+            return pick.text || null;
+        }
+
+        function showTip(text) {
+            const container = document.getElementById('tipContainer');
+            const textEl = document.getElementById('tipText');
+            if (!container || !textEl) return;
+            textEl.innerHTML = text;
+            container.style.display = 'block';
+            // ensure above modals
+            container.style.zIndex = 1300;
+            // clear previous hide timer
+            if (tipHideTimer) clearTimeout(tipHideTimer);
+            const duration = (userSettings.tipsDuration || 25) * 1000;
+            tipHideTimer = setTimeout(hideTip, duration);
+        }
+
+        function hideTip() {
+            const container = document.getElementById('tipContainer');
+            if (!container) return;
+            container.style.display = 'none';
+        }
+
+        function startTipsLoop() {
+            stopTipsLoop();
+            const enabled = (userSettings.tipsEnabled !== undefined) ? userSettings.tipsEnabled : (userSettings.enableTips || true);
+            if (!enabled) return;
+            // show initial tip immediately
+            const initial = pickNextTip();
+            if (initial) {
+                // add recommended sign-in tip if not logged in
+                let message = initial;
+                if (!(authState && authState.user) && message.toLowerCase().indexOf('sync') === -1) {
+                    const rec = currentLang === 'he' ? ' • מומלץ להירשם כדי לסנכרן בין מכשירים.' : (currentLang === 'es' ? ' • Recomendado iniciar sesión para sincronizar.' : ' • Recommended to sign in to sync across devices.');
+                    message = message + rec;
+                }
+                showTip(message);
+            }
+            // schedule repeating tips based on userSettings.tipIntervalSeconds (fallback to tipsDuration+8)
+            const interval = userSettings.tipIntervalSeconds || ((userSettings.tipsDuration || 25) + 8);
+            const intervalMs = Math.max(5, interval) * 1000;
+            tipsTimer = setInterval(() => {
+                const next = pickNextTip();
+                if (next) showTip(next);
+            }, intervalMs);
+        }
+
+        function stopTipsLoop() {
+            if (tipsTimer) { clearInterval(tipsTimer); tipsTimer = null; }
+            if (tipHideTimer) { clearTimeout(tipHideTimer); tipHideTimer = null; }
+            hideTip();
+        }
+
+        // Restart tips when settings change (simple restart without resetting defaults)
+        function restartTips() {
+            stopTipsLoop();
+            if (userSettings.tipsEnabled) startTipsLoop();
+        }
+
+        // Initialize application state, load settings/auth and attach event listeners
+        function init() {
+            // Prevent unwanted zoom on input focus (mobile)
+            document.addEventListener('touchmove', function(e) {
+                if (e.target.closest('input') || e.target.closest('select') || e.target.closest('textarea')) {
+                    return; // Allow scrolling in inputs
+                }
+            }, { passive: true });
+
+            // Prevent double-tap zoom
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(e) {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+
+            // Load saved language and auth
+            const savedLang = localStorage.getItem('selectedLanguage') || currentLang;
+            const savedAuth = localStorage.getItem('authState');
+            if (savedAuth) {
+                try {
+                    authState = JSON.parse(savedAuth);
+                } catch (e) {
+                    authState = { user: null, mode: null };
+                }
+            }
+
+            // Apply language and settings
+            updatePageLanguage(savedLang);
+            const langSel = document.getElementById('langSel');
+            if (langSel) langSel.value = savedLang;
+
+            // Load user settings and apply theme/fonts
+            loadUserSettings();
+            updateAuthButton();
+            applyTheme(userSettings.theme || 'dark');
+
+            // Wire up primary controls
+            const authBtn = document.getElementById('authBtn');
+            if (authBtn) authBtn.addEventListener('click', () => {
+                if (authState.user || authState.mode === 'guest') handleLogout(); else openAuthModal();
+            });
+
+            if (langSel) langSel.addEventListener('change', (e) => {
+                updatePageLanguage(e.target.value);
+                loadConfig();
+            });
+
+            const authModal = document.getElementById('authModal');
+            if (authModal) authModal.addEventListener('click', (e) => { if (e.target.id === 'authModal') closeAuthModal(); });
+
+            // Wire up floating icon buttons
+            const iconBtns = {
+                'icon-budget': 'budget-popup',
+                'icon-design': 'design-popup',
+                'icon-language': 'language-popup',
+                'icon-notifications': 'notifications-popup',
+                'icon-tips': 'tips-popup',
+                'icon-account': 'account-popup'
+            };
+            
+            Object.entries(iconBtns).forEach(([btnId, popupId]) => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openPopup(popupId);
+                    });
+                }
+            });
+
+            // Close popups when clicking outside
+            document.addEventListener('click', (e) => {
+                const isPopupClick = e.target.closest('.settings-popup');
+                const isIconClick = e.target.closest('.icon-btn');
+                if (!isPopupClick && !isIconClick) {
+                    closeAllPopups();
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeBudgetPanel();
+                    closeAddTransactionModal();
+                    closeAllPopups();
+                }
+            });
+
+            const tipsToggleEl = document.getElementById('tipsToggle');
+            if (tipsToggleEl) tipsToggleEl.addEventListener('click', () => { setTipsEnabled(!userSettings.tipsEnabled); });
+
+            // currency UI removed
+            renderNotificationHistory();
+            renderTipList();
+            // loadConfig() - disabled for offline-first mode
+        }
+
+        async function loadConfig() {
+            try{
+                const res = await fetch('/config', { signal: AbortSignal.timeout(3000) });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const cfg = await res.json();
+                const banner = document.getElementById('configBanner');
+                const t = translations[currentLang];
+                if(!cfg.hasKeys){
+                    banner.innerHTML = t.configNotSet;
+                } else {
+                    banner.innerHTML = t.configDetected;
+                }
+            }catch(e){
+                const b = document.getElementById('configBanner');
+                const t = translations[currentLang];
+                // Silently hide banner if server not running
+                if (e.name === 'AbortError' || e.message.includes('Failed to fetch')) {
+                    b.style.display = 'none';
+                } else {
+                    b.textContent = t.configError + e.message;
+                }
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
